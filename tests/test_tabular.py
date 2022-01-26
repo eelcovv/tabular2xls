@@ -92,14 +92,14 @@ def test_tabular_1():
 
 def test_tabular_2():
     """API Tests"""
-    tabular_df = parse_tabular(input_filename='tabular_2.tex')
+    tabular_df = parse_tabular(input_filename='tabular_2.tex', multi_index=True)
 
     expected_column_names = pd.Index(['2008-2013', '2014-2019 ¹⁾'], dtype='object')
 
     expected_index = pd.Index([('Totaal door OM genomen beslissingen', ''),
                                ('', '- waaronder strafoplegging OM²⁾'),
                                ('Schuldig verklaard door rechter', '')],
-                              dtype='object', name='', tupleize_cols=False)
+                              dtype='object', names=["", ""], tupleize_cols=True)
 
     expected_columns = {
         "2008-2013": np.array(['512', '93', '124'], dtype=object),

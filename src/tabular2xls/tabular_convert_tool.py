@@ -29,9 +29,10 @@ def parse_args(args):
         action="version",
         version="tabular2xls {ver}".format(ver=__version__),
     )
-    parser.add_argument("filename", help="Tabular file name", metavar="STR")
-    parser.add_argument("output_filename", help="Naam van de xls output file. Moet extensie .xlsx "
-                                                "hebben", metavar="STR")
+    parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
+    parser.add_argument("--output_filename",
+                        help="Naam van de xls output file. Moet extensie .xlsx "
+                             "hebben", metavar="OUTPUT_FILENAME")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -39,6 +40,7 @@ def parse_args(args):
         help="set loglevel to INFO",
         action="store_const",
         const=logging.INFO,
+        default=logging.INFO,
     )
     parser.add_argument(
         "-vv",
@@ -47,6 +49,11 @@ def parse_args(args):
         help="set loglevel to DEBUG",
         action="store_const",
         const=logging.DEBUG,
+    )
+    parser.add_argument(
+        "--multi_index",
+        help="Forceer een multiindex dataframe",
+        action="store_true",
     )
     return parser.parse_args(args)
 
@@ -86,10 +93,11 @@ def main(args):
     if ".xlsx" not in xls_filename.suffix:
         raise ValueError("Output filename does not have .xlsx extension. Please correct")
 
-    tabular_df = parse_tabular(input_filename=filename)
+    _logger.info(f"Converting {filename} ->> {xls_filename}")
+    tabular_df = parse_tabular(input_filename=filename, multi_index=args.multi_index)
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
-    _logger.info(f"Writing to {xls_filename}")
+    _logger.debug(f"Writing to {xls_filename}")
     tabular_df.to_excel(xls_filename)
 
 

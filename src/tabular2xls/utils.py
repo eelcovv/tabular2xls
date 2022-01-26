@@ -95,7 +95,7 @@ def clean_the_cells(cells, aliases=None):
     return clean_cells
 
 
-def parse_tabular(input_filename):
+def parse_tabular(input_filename, multi_index=False):
     """
     read the tabular file and convert contents to a data frame
 
@@ -103,6 +103,8 @@ def parse_tabular(input_filename):
     ----------
     input_filename: str or Path
         Name of the tex tabular file
+    multi_index: bool
+        Converteer de index in een multi index op basis van de eerste 2 kolommen
 
     Returns
     -------
@@ -110,6 +112,7 @@ def parse_tabular(input_filename):
         Dataframe of the tabular
     """
 
+    _logger.debug(f"Reading file {input_filename}")
     with open(input_filename, "r") as fp:
         lines = fp.readlines()
     rows = list()
@@ -142,8 +145,17 @@ def parse_tabular(input_filename):
             _logger.debug(f"OUTSIZE : {clean_line}")
 
     first_col = header_row[0]
-    table_df = pd.DataFrame.from_records(rows, columns=header_row)
-    table_df.set_index(first_col, drop=True, inplace=True)
+    if multi_index:
+        if header_row[0] == "":
+            header_row[0] = "l1"
+        if header_row[1] == "":
+            header_row[1] = "l2"
+        table_df = pd.DataFrame.from_records(rows, columns=header_row)
+        table_df.set_index(["l1", "l2"], drop=True, inplace=True)
+        table_df.index = table_df.index.rename(["", ""])
+    else:
+        table_df = pd.DataFrame.from_records(rows, columns=header_row)
+        table_df.set_index(first_col, drop=True, inplace=True)
 
     for alias, pattern in aliases.items():
         for col_name in table_df.columns:
