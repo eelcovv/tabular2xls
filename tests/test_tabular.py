@@ -88,3 +88,27 @@ def test_tabular_1():
     for column_name in expected_column_names:
         expected_col = expected_columns[column_name]
         nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
+
+
+def test_tabular_2():
+    """API Tests"""
+    tabular_df = parse_tabular(input_filename='tabular_2.tex')
+
+    expected_column_names = pd.Index(['2008-2013', '2014-2019 ¹⁾'], dtype='object')
+
+    expected_index = pd.Index([('Totaal door OM genomen beslissingen', ''),
+                               ('', '- waaronder strafoplegging OM²⁾'),
+                               ('Schuldig verklaard door rechter', '')],
+                              dtype='object', name='', tupleize_cols=False)
+
+    expected_columns = {
+        "2008-2013": np.array(['512', '93', '124'], dtype=object),
+        "2014-2019 ¹⁾": np.array(['551', '88', '82'], dtype=object)
+    }
+
+    pt.assert_index_equal(tabular_df.columns, expected_column_names)
+    pt.assert_index_equal(tabular_df.index, expected_index)
+    for column_name in expected_column_names:
+        expected_col = expected_columns[column_name]
+        nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
+

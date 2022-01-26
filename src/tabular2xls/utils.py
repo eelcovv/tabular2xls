@@ -67,7 +67,6 @@ def clean_the_cells(cells, aliases=None):
     """ remove all spurious latex code from cell contents """
     clean_cells = list()
     for cell in cells:
-
         clean_cell = replace_textsuper(cell)
         clean_cell, n_col = get_multicolumns(clean_cell)
         clean_cell = clean_cell.replace("\\rowcolor{white}", "")
@@ -76,6 +75,8 @@ def clean_the_cells(cells, aliases=None):
         clean_cell = clean_cell.replace("\\textbf{", "")
         clean_cell = clean_cell.replace("\\emph{", "")
         clean_cell = clean_cell.replace("\\python{", "")
+        clean_cell = re.sub(r"\\hspace{.*?}", "", clean_cell)
+        clean_cell = re.sub(r"\\vspace{.*?}", "", clean_cell)
         clean_cell = clean_cell.replace("}", "")
         clean_cell = clean_cell.replace("{", "")
         clean_cell = clean_cell.replace("\\", "")
@@ -87,6 +88,10 @@ def clean_the_cells(cells, aliases=None):
                     clean_cell = clean_cell.replace(alias, pattern)
 
         clean_cells.append(clean_cell.strip())
+        if n_col is not None and n_col > 1:
+            for ii in range(1, n_col):
+                clean_cells.append("")
+
     return clean_cells
 
 
