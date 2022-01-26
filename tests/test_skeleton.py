@@ -1,25 +1,18 @@
 import pytest
+import pandas as pd
 
-from tabular2xls.skeleton import fib, main
+from tabular2xls.tabular_convert_tool import parse_tabular
 
 __author__ = "EVLT"
 __copyright__ = "EVLT"
 __license__ = "MIT"
 
 
-def test_fib():
+def test_tabular_1():
     """API Tests"""
-    assert fib(1) == 1
-    assert fib(2) == 1
-    assert fib(7) == 13
-    with pytest.raises(AssertionError):
-        fib(-10)
+    pass
+    tabular_df = parse_tabular(input_filename='tabular_1.tex')
+
+    assert  1 == 2
 
 
-def test_main(capsys):
-    """CLI Tests"""
-    # capsys is a pytest fixture that allows asserts agains stdout/stderr
-    # https://docs.pytest.org/en/stable/capture.html
-    main(["7"])
-    captured = capsys.readouterr()
-    assert "The 7-th Fibonacci number is 13" in captured.out

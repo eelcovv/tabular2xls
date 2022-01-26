@@ -1,0 +1,50 @@
+% de aliassen die we gebruiken
+\newcommand{\goodbad}{\emph{good}/\emph{bad}}
+\newcommand{\goodbadother}{\emph{good}/\emph{bad}/\emph{other}}
+\newcommand{\goodbadothernt}{\emph{good}/\emph{bad}/\emph{other}/\emph{not tested}}
+\newcommand{\goodbadnt}{\emph{good}/\emph{bad}/\emph{not tested}}
+\newcommand{\goodokbadnt}{\emph{good}/\emph{ok}/\emph{bad}/\emph{not tested}}
+\newcommand{\goodbadnant}{\emph{good}/\emph{bad}/\emph{N.A.}/\emph{not tested}}
+\newcommand{\goodbadsf}{\emph{good}/\emph{bad}/\emph{server failed}}
+\newcommand{\goodbadphaseoutnt}{\emph{good}/\emph{bad}/\emph{phase out}/\emph{not tested}}
+%! suppress = EscapeAmpersand
+\begin{cbstabular}{G{0.15\textwidth}>{\footnotesize}L{0.32\textwidth}>{\footnotesize}L{0.28\textwidth}>{\tiny}L{0.35\textwidth}}
+    \rowcolor{white}\cornercell{\textbf{Categorie}} &  \textbf{Testomschrijving} &\textbf{Testuitkomsten}  &  \normalsize{\textbf{Variabelenaam}}\\
+    \grayhline
+    \textbf{IPv6} &  IPv6-adressen voor \emph{nameservers} & \goodbadother &    \python{tests_web_ipv6_ns_address_verdict} \\
+    &  IPv6-bereikbaarheid van \emph{nameservers}&  \goodbadnt & \python{tests_web_ipv6_ns_reach_verdict} \\
+    &  IPv6-adressen voor \emph{webserver} & \goodbad  &  \python{tests_web_ipv6_ws_address_verdict} \\
+    &  IPv6-bereikbaarheid van \emph{webservers} & \goodbadnt   & \python{tests_web_ipv6_ws_reach_verdict} \\
+    & Gelijke website op IPv6 en IPv4 & \goodbadnt  & \python{tests_web_ipv6_ws_similar_verdict} \\
+    \grayhline
+    \textbf{DNSSEC} & DNSSEC aanwezig  &  \goodbadsf &  \python{tests_web_dnssec_exist_verdict} \\
+    & DNSSEC geldigheid & \goodbadnt  &  \python{tests_web_dnssec_valid_verdict} \\
+    \grayhline
+    \textbf{HTTPS} &  HTTPS beschikbaar & \goodbadother   &  \python{tests_web_https_http_available_verdict} \\
+    & HTTPS-doorverwijzing &  \goodbadothernt &  \python{tests_web_https_http_redirect_verdict} \\
+    &  HTTPS-compressie &  \goodbadnt &  \python{tests_web_https_http_compress_verdict} \\
+    & HSTS aangeboden &  \goodbadothernt &  \python{tests_web_https_http_hsts_verdict} \\
+    & TLS Versie & \goodbadphaseoutnt  &  \python{tests_web_https_tls_version_verdict} \\
+    & TLS ciphers & \goodbadphaseoutnt   &  \python{tests_web_https_tls_ciphers_verdict} \\
+    & TLS cipher-volgorde & \goodbadothernt  &  \python{tests_web_https_tls_cipherorder_verdict} \\
+    & TLS sleuteluitwisselingsparameters & \goodbadphaseoutnt   &  \python{tests_web_https_tls_keyexchange_verdict} \\
+    & Hashfunctie voor sleuteluitwisseling &  \goodbadphaseoutnt  &  \python{tests_web_https_tls_keyexchangehash_verdict} \\
+    & TLS-compressie &  \goodbadnt  &  \python{tests_web_https_tls_compress_verdict} \\
+    & \emph{Secure renegotiation} & \goodbadnt &  \python{tests_web_https_tls_secreneg_verdict} \\
+    & \emph{Client initiated renegotiation}& \goodbadnt &  \python{tests_web_https_tls_clientreneg_verdict} \\
+    & 0-RTT &  \goodbadnant  &  \python{tests_web_https_tls_0rtt_verdict} \\
+    & TLS OCSP-stapeling & \goodokbadnt  &  \python{tests_web_https_tls_ocsp_verdict} \\
+    & Vertrouwensketen van certificaat & \goodbadnt  &  \python{tests_web_https_cert_chain_verdict} \\
+    & Publieke sleutel van certificaat & \goodbadnt   &  \python{tests_web_https_cert_pubkey_verdict} \\
+    & Handtekening van certificaat  & \goodbadnt  &  \python{tests_web_https_cert_sig_verdict} \\
+    & Domeinnaam op certificaat & \goodbadnt  &  \python{tests_web_https_cert_domain_verdict} \\
+    & DANE aanwezig  & \goodbadnt  &  \python{tests_web_https_dane_exist_verdict} \\
+    & DANE geldigheid  & \goodbadnt  &  \python{tests_web_https_dane_valid_verdict} \\
+    \grayhline
+    \textbf{Beveiligings-}
+    & \emph{X-Frame-options} & \goodbadphaseoutnt  &  \python{tests_web_appsecpriv_x_frame_options_verdict} \\
+    \textbf{opties} & \emph{X-Content-Type-Options}&  \goodbadphaseoutnt &  \python{tests_web_appsecpriv_x_content_type_options_verdict} \\
+    & \emph{Content-Security-Policy} & \goodbadnt  &  \python{tests_web_appsecpriv_csp_verdict} \\
+    & \emph{Referrer-Policy} aanwezig & \goodbadnt  &  \python{tests_web_appsecpriv_referrer_policy_verdict} \\
+    \grayhline
+\end{cbstabular}
