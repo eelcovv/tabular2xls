@@ -33,6 +33,9 @@ def parse_args(args):
     parser.add_argument("--output_filename",
                         help="Naam van de xls output file. Moet extensie .xlsx "
                              "hebben", metavar="OUTPUT_FILENAME")
+    parser.add_argument("--output_directory",
+                        help="Naam van de output directory. Als niet gegeven wordt het"
+                             "door de output filenaam bepaald", metavar="OUTPUT_DIRECTORY")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -89,6 +92,11 @@ def main(args):
         xls_filename = filename.with_suffix(".xlsx")
     else:
         xls_filename = Path(args.output_filename)
+
+    if args.output_directory is not None:
+        output_directory = Path(args.output_directory)
+        xls_file_base = xls_filename.stem + xls_filename.suffix
+        xls_filename = output_directory / Path(xls_file_base)
 
     if ".xlsx" not in xls_filename.suffix:
         raise ValueError("Output filename does not have .xlsx extension. Please correct")
