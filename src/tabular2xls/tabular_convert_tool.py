@@ -30,6 +30,8 @@ def parse_args(args):
         version="tabular2xls {ver}".format(ver=__version__),
     )
     parser.add_argument("filename", help="Tabular file name", metavar="STR")
+    parser.add_argument("output_filename", help="Naam van de xls output file. Moet extensie .xlsx "
+                                                "hebben", metavar="STR")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -76,25 +78,19 @@ def main(args):
 
     filename = Path(args.filename)
 
-    if args.output_directory is None:
-        out_dir = filename.parent
+    if args.output_filename is None:
+        xls_filename = filename.with_suffix(".xlsx")
     else:
-        out_dir = Path(args.output_directory)
-
-    if args.xls_filename is None:
-        xls_filename = filename.with_suffix(".xlsx").stem
-    else:
-        xls_filename = Path(args.xls_filename)
+        xls_filename = Path(args.output_filename)
 
     if ".xlsx" not in xls_filename.suffix:
         raise ValueError("Output filename does not have .xlsx extension. Please correct")
 
     tabular_df = parse_tabular(input_filename=filename)
 
-    table_file = out_dir / xls_filename
-    table_file.parent.mkdir(exist_ok=True, parents=True)
-    _logger.info(f"Writing to {table_file}")
-    tabular_df.to_excel(table_file)
+    xls_filename.parent.mkdir(exist_ok=True, parents=True)
+    _logger.info(f"Writing to {xls_filename}")
+    tabular_df.to_excel(xls_filename)
 
 
 def run():
