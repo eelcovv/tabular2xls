@@ -112,3 +112,55 @@ def test_tabular_2():
         expected_col = expected_columns[column_name]
         nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
 
+
+def test_tabular_3():
+    """API Tests"""
+    tabular_df = parse_tabular(input_filename='tabular_3.tex')
+
+    expected_column_names = pd.Index(['Bedrijfsklasse'], dtype='object')
+
+    expected_index = pd.Index(['C', 'D-E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Q', 'ICT'],
+                              dtype='object', name='Code')
+
+    expected_columns = {
+        "Bedrijfsklasse": np.array(['Industrie', 'Energie, water, afvalbeheer', 'Bouwnijverheid',
+                                    'Handel', 'Vervoer en opslag', 'Horeca',
+                                    'Informatie en communicatie', 'Financiële dienstverlening',
+                                    'Verhuur en handel van onroerend goed',
+                                    'Specialistische zakelijke diensten',
+                                    'Verhuur en overige zakelijke diensten',
+                                    'Gezondheids- en welzijnszorg', 'ICT-sector'], dtype=object)
+    }
+
+    pt.assert_index_equal(tabular_df.columns, expected_column_names)
+    pt.assert_index_equal(tabular_df.index, expected_index)
+    for column_name in expected_column_names:
+        expected_col = expected_columns[column_name]
+        nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
+
+
+def test_tabular_4():
+    """API Tests"""
+    tabular_df = parse_tabular(input_filename='tabular_4.tex')
+
+    expected_column_names = pd.Index(['Bedrijfsgrootte'], dtype='object')
+
+    expected_index = pd.Index(['Totaal', '2-250', '2', '3-5', '5-10', '10-20', '20-50', '50-100',
+                               '100-250', '250-500', '500+'],
+                              dtype='object', name='Code')
+
+    expected_columns = {
+        "Bedrijfsgrootte": np.array(['2 of meer werkzame personen', '2 tot 250 werkzame personen',
+                                     '2 werkzame personen', '3 tot 5 werkzame personen',
+                                     '5 tot 10 werkzame personen', '10 tot 20 werkzame personen',
+                                     '20 tot 50 werkzame personen', '50 tot 100 werkzame personen',
+                                     '100 tot 250 werkzame personen',
+                                     '250 tot 500 werkzame personen',
+                                     '500 of meer werkzame personen'], dtype=object)
+    }
+
+    pt.assert_index_equal(tabular_df.columns, expected_column_names)
+    pt.assert_index_equal(tabular_df.index, expected_index)
+    for column_name in expected_column_names:
+        expected_col = expected_columns[column_name]
+        nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)

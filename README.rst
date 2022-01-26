@@ -3,13 +3,13 @@ tabular2xls
 ===========
 
 
-Add a short description here!
+Conveteer een LaTeX tabular file naar een xls
 
 
 Description
 ===========
 
-A longer description of your project goes here...
+Met deze tool kan je LaTeX tabular files naar excel converteren
 
 
 .. _pyscaffold-notes:
