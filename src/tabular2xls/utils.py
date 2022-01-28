@@ -69,23 +69,23 @@ def clean_the_cells(cells, aliases=None):
     for cell in cells:
         clean_cell = replace_textsuper(cell)
         clean_cell, n_col = get_multicolumns(clean_cell)
-        clean_cell = clean_cell.replace("\\rowcolor{white}", "", regex=True)
-        clean_cell = clean_cell.replace("\\cornercell{", "", regex=True)
-        clean_cell = clean_cell.replace("\\normalsize{", "", regex=True)
-        clean_cell = clean_cell.replace("\\textbf{", "", regex=True)
-        clean_cell = clean_cell.replace("\\emph{", "", regex=True)
-        clean_cell = clean_cell.replace("\\python{", "", regex=True)
-        clean_cell = clean_cell.replace(r"\\hspace{.*?}", "", clean_cell, regex=True)
-        clean_cell = clean_cell.replace(r"\\vspace{.*?}", "", clean_cell, regex=True)
-        clean_cell = clean_cell.replace("}", "", regex=True)
-        clean_cell = clean_cell.replace("{", "", regex=True)
-        clean_cell = clean_cell.replace("\\", "", regex=True)
-        clean_cell = clean_cell.replace("--", "-", regex=True)
+        clean_cell = clean_cell.replace("\\rowcolor{white}", "")
+        clean_cell = clean_cell.replace("\\cornercell{", "")
+        clean_cell = clean_cell.replace("\\normalsize{", "")
+        clean_cell = clean_cell.replace("\\textbf{", "")
+        clean_cell = clean_cell.replace("\\emph{", "")
+        clean_cell = clean_cell.replace("\\python{", "")
+        clean_cell = re.sub(r"\\hspace{.*?}", "", clean_cell)
+        clean_cell = re.sub(r"\\vspace{.*?}", "", clean_cell)
+        clean_cell = clean_cell.replace("}", "")
+        clean_cell = clean_cell.replace("{", "")
+        clean_cell = clean_cell.replace("\\", "")
+        clean_cell = clean_cell.replace("--", "-")
 
         if aliases is not None:
             for alias, pattern in aliases.items():
                 if match := re.match(alias, clean_cell):
-                    clean_cell = clean_cell.replace(alias, pattern, regex=True)
+                    clean_cell = clean_cell.replace(alias, pattern)
 
         clean_cells.append(clean_cell.strip())
         if n_col is not None and n_col > 1:
