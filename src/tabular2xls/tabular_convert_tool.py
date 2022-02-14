@@ -39,7 +39,7 @@ def parse_args(args):
     parser.add_argument("--search_and_replace",
                         help="Search en Replace patterns als je nog string wilt veranderen."
                              "Default worden cdots en ast naar resp . en * vervangen",
-                        nargs="*", append=True)
+                        nargs="*", action="append")
     parser.add_argument(
         "-v",
         "--verbose",
