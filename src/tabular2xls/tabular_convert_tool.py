@@ -36,6 +36,10 @@ def parse_args(args):
     parser.add_argument("--output_directory",
                         help="Naam van de output directory. Als niet gegeven wordt het"
                              "door de output filenaam bepaald", metavar="OUTPUT_DIRECTORY")
+    parser.add_argument("--search_and_replace",
+                        help="Search en Replace patterns als je nog string wilt veranderen."
+                             "Default worden cdots en ast naar resp . en * vervangen",
+                        nargs="*", append=True)
     parser.add_argument(
         "-v",
         "--verbose",
@@ -88,6 +92,14 @@ def main(args):
 
     filename = Path(args.filename)
 
+    search_and_replace = {
+        r"\$cdot\$": ".",
+        r"\$ast\$": "*",
+    }
+    if args.search_and_replace is not None:
+        for k, v in args.search_and_replace.items():
+            search_and_replace[k] = v
+
     if args.output_filename is None:
         xls_filename = filename.with_suffix(".xlsx")
     else:
@@ -102,7 +114,8 @@ def main(args):
         raise ValueError("Output filename does not have .xlsx extension. Please correct")
 
     _logger.info(f"Converting {filename} ->> {xls_filename}")
-    tabular_df = parse_tabular(input_filename=filename, multi_index=args.multi_index)
+    tabular_df = parse_tabular(input_filename=filename, multi_index=args.multi_index,
+                               search_and_replace=search_and_replace)
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
