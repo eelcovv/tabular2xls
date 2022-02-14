@@ -95,7 +95,7 @@ def clean_the_cells(cells, aliases=None):
     return clean_cells
 
 
-def parse_tabular(input_filename, multi_index=False):
+def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
     """
     read the tabular file and convert contents to a data frame
 
@@ -105,6 +105,8 @@ def parse_tabular(input_filename, multi_index=False):
         Name of the tex tabular file
     multi_index: bool
         Converteer de index in een multi index op basis van de eerste 2 kolommen
+    search_and_replace:
+        dict met search and replace strings
 
     Returns
     -------
@@ -165,5 +167,9 @@ def parse_tabular(input_filename, multi_index=False):
                                                                     regex=True)
             except AttributeError:
                 pass
+
+    if search_and_replace is not None:
+        for search, replace in search_and_replace.items():
+            table_df.replace(search, replace, regex=True, inplace=True)
 
     return table_df

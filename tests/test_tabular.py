@@ -164,3 +164,59 @@ def test_tabular_4():
     for column_name in expected_column_names:
         expected_col = expected_columns[column_name]
         nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
+
+
+def test_tabular_5():
+    """API Tests"""
+    # let op dat de cdot en ast commando's zonder \ gegeven worden omdat we search en replace
+    # op het eind pas toepassen en dan zijn alle back slashes al verwijderd
+    s_and_r = {
+        r"\$cdot\$": ".",
+        r"\$ast\$": "*",
+    }
+    tabular_df = parse_tabular(input_filename='tabular_5.tex', search_and_replace=s_and_r)
+
+    expected_column_names = pd.Index(['Pilot 2015', 'Onderzoek 2017', 'Onderzoek 2019',
+                                      'Opmerkingen'], dtype='object')
+
+    expected_index = pd.Index(['Disciplines culturele en creatieve sector',
+                               'Aantallen instellingen en bedrijven incl. zelfstandigen',
+                               'Regionale verdeling van instellingen en bedrijven',
+                               'Disciplines cultuureducaties sec (scholing)',
+                               'Artistieke begeleiding amateurgezelschappen',
+                               'Ondersteuning en advisering cultuureducatie',
+                               'Hoe leerlingen zijn aangemeld', 'Hoe leerlingen zijn geworven',
+                               'Aantallen leerlingen / doelgroepen', 'Geografisch servicegebied',
+                               'Financiële gegevens (baten en lasten)', 'Werkgelegenheid',
+                               'Subsidie',
+                               'Samenwerking met andere bedrijven en instellingen',
+                               'Verwachtingen voor het volgend seizoen/jaar'],
+                              dtype='object', name='Onderwerp')
+
+    expected_columns = {
+        'Pilot 2015': np.array(
+            ['.', '*', '*', '*', '.', '*', '*', '.', '*', '.', '.', '.', '*', '*', '*'],
+            dtype='object'),
+        'Onderzoek 2017': np.array(
+            ['*', '*', '*', '*', '.', '*', '*', '.', '*', '*', '*', '*', '*', '*', '*'],
+            dtype='object'),
+        'Onderzoek 2019': np.array(
+            ['*', '*', '*', '*', '*', '*', '.', '*', '*', '*', '*', '*', '*', '*', '.'],
+            dtype='object'),
+        'Opmerkingen': np.array(['In deze rapportage verder buiten beschouwing gelaten',
+                                 "In deze rapportage is gekeken naar alle eenheden van de betreffende SBI's",
+                                 'Adresgegevens zijn beschikbaar als gevolg van de steekproef uit het ABR',
+                                 '', '', '', '', '',
+                                 'Per onderzoek zijn verschillende categoriën gehanteerd',
+                                 'In welke gemeenten of provincies wordt cultuureducatie aangeboden? Tussen 2017 en 2019 was er wel een verschil in vraagstelling',
+                                 'Zie standaardvraagstelling CBS. Beperkt bij zelfstandigen',
+                                 'Zie standaardvraagstelling CBS. Beperkt bij zelfstandigen',
+                                 'In 2017 en 2019 veel uitgebreider dan in 2015. Toen is alleen gevraagd of er wel of geen sprake was van subsidies.',
+                                 '', ''], dtype='object')
+    }
+
+    pt.assert_index_equal(tabular_df.columns, expected_column_names)
+    pt.assert_index_equal(tabular_df.index, expected_index)
+    for column_name in expected_column_names:
+        expected_col = expected_columns[column_name]
+        nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
