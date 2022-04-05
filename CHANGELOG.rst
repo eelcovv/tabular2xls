@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.3.1
+=============
+- update setup for pyscaffold 4
+
 Version 0.3
 ===========
 
