@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from tabular2xls import __version__
-from tabular2xls.utils import parse_tabular
+from tabular2xls.utils import parse_tabular, write_data_to_sheet_multiindex
 
 _logger = logging.getLogger(__name__)
 
@@ -119,7 +119,7 @@ def main(args):
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
-    tabular_df.to_excel(xls_filename)
+    write_data_to_sheet_multiindex(tabular_df, xls_filename)
 
 
 def run():

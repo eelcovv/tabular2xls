@@ -1,6 +1,7 @@
 import logging
 import re
 import pandas as pd
+from pandas.io.formats.excel import ExcelFormatter
 
 _logger = logging.getLogger(__name__)
 
@@ -173,3 +174,239 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
             table_df.replace(search, replace, regex=True, inplace=True)
 
     return table_df
+
+
+class WorkBook:
+    def __init__(self, workbook):
+        self.workbook = workbook
+        self.left_align_italic = None
+        self.left_align_italic_large = None
+        self.left_align_italic_large_ul = None
+        self.left_align_helvetica = None
+        self.left_align_helvetica_bold = None
+        self.left_align_bold = None
+        self.left_align_bold_large = None
+        self.left_align_bold_larger = None
+        self.left_align = None
+        self.left_align_large_wrap = None
+        self.left_align_large_wrap_top = None
+        self.left_align_wrap = None
+        self.left_align_large = None
+        self.right_align = None
+        self.header_format = None
+        self.title_format = None
+        self.section_heading = None
+        self.footer_format = None
+        self.add_styles()
+
+    def add_styles(self):
+        self.left_align_helvetica = self.workbook.add_format({
+            'font': "helvetica",
+            'align': 'left',
+            'font_size': 8,
+            'border': 0
+        })
+        self.left_align_helvetica_bold = self.workbook.add_format({
+            'font': "helvetica",
+            'bold': True,
+            'align': 'left',
+            'font_size': 8,
+            'border': 0
+        })
+        self.left_align_italic = self.workbook.add_format({
+            'font': "arial",
+            'italic': True,
+            'align': 'left',
+            'font_size': 8,
+            'border': 0
+        })
+        self.left_align_italic_large = self.workbook.add_format({
+            'font': "arial",
+            'italic': True,
+            'align': 'left',
+            'font_size': 10,
+            'border': 0
+        })
+        self.left_align_italic_large_ul = self.workbook.add_format({
+            'font': "arial",
+            'italic': True,
+            'align': 'left',
+            'underline': True,
+            'font_size': 10,
+            'border': 0
+        })
+        self.left_align_bold = self.workbook.add_format({
+            'font': "arial",
+            'bold': True,
+            'align': 'left',
+            'font_size': 8,
+            'border': 0
+        })
+        self.left_align_bold_large = self.workbook.add_format({
+            'font': "arial",
+            'bold': True,
+            'align': 'left',
+            'font_size': 10,
+            'border': 0
+        })
+        self.left_align_bold_larger = self.workbook.add_format({
+            'font': "arial",
+            'bold': True,
+            'align': 'left',
+            'font_size': 12,
+            'border': 0
+        })
+        self.left_align = self.workbook.add_format({
+            'font': "arial",
+            'align': 'left',
+            'font_size': 8,
+            'border': 0
+        })
+        self.left_align_large_wrap = self.workbook.add_format({
+            'font': "arial",
+            'align': 'left',
+            'text_wrap': True,
+            'font_size': 10,
+            'border': 0
+        })
+        self.left_align_large_wrap_top = self.workbook.add_format({
+            'font': "arial",
+            'align': 'left',
+            'valign': 'top',
+            'text_wrap': True,
+            'font_size': 10,
+            'border': 0
+        })
+        self.left_align_large = self.workbook.add_format({
+            'font': "arial",
+            'align': 'left',
+            'font_size': 10,
+            'border': 0
+        })
+        self.right_align = self.workbook.add_format({
+            'font': "arial",
+            'align': 'right',
+            'font_size': 8,
+            'border': 0
+        })
+        self.header_format = self.workbook.add_format({
+            'font': "arial",
+            'bold': True,
+            'italic': True,
+            'text_wrap': True,
+            'align': 'left',
+            'font_size': 8,
+        })
+        self.header_format.set_bottom()
+        self.header_format.set_top()
+
+        self.title_format = self.workbook.add_format({
+            'font': "arial",
+            'bold': True,
+            'italic': False,
+            'text_wrap': True,
+            'align': 'centre',
+            'font_size': 12,
+        })
+        self.section_heading = self.workbook.add_format({
+            'font': "arial",
+            'bold': True,
+            'italic': True,
+            'text_wrap': True,
+            'align': 'left',
+            'font_size': 11,
+        })
+
+        self.footer_format = self.workbook.add_format({
+            'font': "arial",
+            'align': 'left',
+            'font_size': 8,
+        })
+        self.footer_format.set_top()
+
+
+def update_width(label, max_width):
+    width = len(label)
+    if width > max_width:
+        max_width = width
+    return max_width
+
+
+def get_max_width(data_frame, name, index=False):
+    """ bepaal de maximale string in een index of column """
+    max_col_width = len(name)
+    if index:
+        values = data_frame.index.get_level_values(name)
+    else:
+        values = data_frame[name]
+    for value in values:
+        col_width = len(str(value))
+        if col_width > max_col_width:
+            max_col_width = col_width
+
+
+def write_data_to_sheet_multiindex(data_df, xls_sheet_name):
+    """
+    Schrijf de data naar excel file met format
+
+    Parameters
+    ----------
+    data_df: pd.DataFrame
+        De data die we naar excel scrhijven
+    writer: obj
+    sheet_name: str
+        De sheet name
+
+    """
+
+    writer = pd.ExcelWriter(xls_sheet_name, engine="xlsxwriter")
+
+    ExcelFormatter.header_style = None
+
+    workbook = writer.book
+    worksheet = writer.sheets[sheet_name]
+
+    left_align = workbook.add_format()
+    left_align.set_align('left')
+    left_align.set_align('top')
+    left_align.set_font_size(8)
+    left_align_bold = workbook.add_format()
+    left_align_bold.set_align('left')
+    left_align_bold.set_align('top')
+    left_align_bold.set_font_size(8)
+    left_align_bold.set_bold()
+    right_align = workbook.add_format()
+    right_align.set_align('right')
+    right_align.set_align('vcenter')
+    right_align.set_font_size(8)
+    header_format = workbook.add_format({
+        'bold': True,
+        'text_wrap': True,
+        'font_size': 8,
+        'valign': 'top',
+        'fg_color': '#D7E4BC',
+        'border': 1})
+
+    n_col = 0
+    character_width = 0.7
+
+    for col_idx, index_name in enumerate(data_df.index.names):
+        col_width = get_max_width(data_frame=data_df, name=index_name, index=True)
+        _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
+        if col_idx == 0:
+            align = left_align_bold
+        else:
+            align = left_align
+        worksheet.set_column(col_idx, col_idx, col_width * character_width, cell_format=align)
+        n_col += 1
+        worksheet.write(0, col_idx, index_name, header_format)
+
+    offset = 0
+    for col_idx, column_name in enumerate(data_df.columns):
+        col_width = get_max_width(data_frame=data_df, name=column_name, index=False) - offset
+        _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
+        worksheet.set_column(col_idx + n_col, col_idx + n_col, col_width * character_width,
+                             cell_format=right_align)
+        worksheet.write(0, col_idx + n_col, column_name, header_format)
+
+    _logger.info("Done")
