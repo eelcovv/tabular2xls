@@ -2,8 +2,16 @@ import logging
 import re
 import pandas as pd
 from pandas.io.formats.excel import ExcelFormatter
+import cbsplotlib.colors as cbc
+import matplotlib.colors as mlc
 
 _logger = logging.getLogger(__name__)
+
+CBS_COLORS = [c.replace("cbs:", "") for c in cbc.CBS_COLORS.keys()]
+MTL_COLORS = [c.replace("xkcd:", "") for c in mlc.get_named_colors_mapping().keys()]
+MIN_COLOR_LENGTH = 2
+# neem alleen de kleurennamen met minimaal 3 characters
+ALL_COLORS = [c for c in CBS_COLORS + MTL_COLORS if len(c) > MIN_COLOR_LENGTH]
 
 
 # function to convert to superscript
@@ -324,6 +332,29 @@ class WorkBook:
         })
         self.footer_format.set_top()
 
+    def set_format(self, color_name):
+
+        color_code = None
+        try:
+            color_code = cbc.CBS_COLORS_HEX[color_name]
+        except KeyError:
+            try:
+                color_code = cbc.CBS_COLORS_HEX["cbs:" + color_name]
+            except KeyError:
+                try:
+                    color_code = mlc.get_named_colors_mapping()[color_name]
+                except KeyError:
+                    _logger.warning(f"kleur {color_name} niet gevonden")
+
+        if color_code is not None:
+            cell_format = self.workbook.add_format({'font_size': 8})
+            cell_format.set_font_color(color_code)
+
+        else:
+            cell_format = None
+
+        return cell_format
+
 
 def update_width(label, max_width):
     width = len(label)
@@ -344,8 +375,19 @@ def get_max_width(data_frame, name, index=False):
         if col_width > max_col_width:
             max_col_width = col_width
 
+    return max_col_width
 
-def write_data_to_sheet_multiindex(data_df, xls_sheet_name):
+
+def find_color_name(value: str):
+    found_color = None
+    for color_name in ALL_COLORS:
+        if value.startswith(color_name):
+            found_color = color_name
+            break
+    return found_color
+
+
+def write_data_to_sheet_multiindex(data_df, file_name, sheet_name="Sheet"):
     """
     Schrijf de data naar excel file met format
 
@@ -353,60 +395,61 @@ def write_data_to_sheet_multiindex(data_df, xls_sheet_name):
     ----------
     data_df: pd.DataFrame
         De data die we naar excel scrhijven
-    writer: obj
+    file_name: str
     sheet_name: str
         De sheet name
 
     """
 
-    writer = pd.ExcelWriter(xls_sheet_name, engine="xlsxwriter")
+    writer = pd.ExcelWriter(file_name, engine="xlsxwriter")
+
+    data_df.to_excel(excel_writer=writer, sheet_name=sheet_name)
 
     ExcelFormatter.header_style = None
 
     workbook = writer.book
     worksheet = writer.sheets[sheet_name]
 
-    left_align = workbook.add_format()
-    left_align.set_align('left')
-    left_align.set_align('top')
-    left_align.set_font_size(8)
-    left_align_bold = workbook.add_format()
-    left_align_bold.set_align('left')
-    left_align_bold.set_align('top')
-    left_align_bold.set_font_size(8)
-    left_align_bold.set_bold()
-    right_align = workbook.add_format()
-    right_align.set_align('right')
-    right_align.set_align('vcenter')
-    right_align.set_font_size(8)
-    header_format = workbook.add_format({
-        'bold': True,
-        'text_wrap': True,
-        'font_size': 8,
-        'valign': 'top',
-        'fg_color': '#D7E4BC',
-        'border': 1})
+    wb = WorkBook(workbook=workbook)
 
-    n_col = 0
-    character_width = 0.7
+    n_index = 0
+    max_width = 0
+    character_width = 1
+    start_row = 0
 
     for col_idx, index_name in enumerate(data_df.index.names):
         col_width = get_max_width(data_frame=data_df, name=index_name, index=True)
         _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
-        if col_idx == 0:
-            align = left_align_bold
-        else:
-            align = left_align
+        align = wb.left_align
         worksheet.set_column(col_idx, col_idx, col_width * character_width, cell_format=align)
-        n_col += 1
-        worksheet.write(0, col_idx, index_name, header_format)
+        worksheet.write(start_row, col_idx, index_name, wb.header_format)
 
-    offset = 0
+        for value in data_df.index.get_level_values(index_name):
+            found_color_name = find_color_name(value)
+            if found_color_name is not None:
+                _logger.info(f"Going to set {value} {found_color_name}")
+
+        n_index += 1
+
     for col_idx, column_name in enumerate(data_df.columns):
-        col_width = get_max_width(data_frame=data_df, name=column_name, index=False) - offset
-        _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
-        worksheet.set_column(col_idx + n_col, col_idx + n_col, col_width * character_width,
-                             cell_format=right_align)
-        worksheet.write(0, col_idx + n_col, column_name, header_format)
+        col_width = get_max_width(data_frame=data_df, name=column_name, index=False)
+        _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
+        align = wb.left_align
+        col_idx2 = col_idx + n_index
+        worksheet.set_column(col_idx2, col_idx2, col_width * character_width, cell_format=align)
+        worksheet.write(start_row, col_idx2, column_name, wb.header_format)
 
+        for idx, value in enumerate(data_df[column_name]):
+            found_color_name = find_color_name(value)
+            if found_color_name is not None:
+                _logger.info(f"Going to set {value} {found_color_name}")
+                cell_format = wb.set_format(found_color_name)
+                new_value = value.replace(found_color_name, "")
+                if cell_format is not None:
+                    worksheet.write(idx + 1, col_idx2, new_value, cell_format)
+                else:
+                    _logger
+                    worksheet.write(idx + 1, col_idx2, new_value)
+
+    writer.save()
     _logger.info("Done")
