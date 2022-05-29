@@ -2,8 +2,9 @@
 Changelog
 =========
 
-Version 0.3.1
+Version 0.3.2
 =============
+- cbs kleuren worden herkend en vertaald
 - update setup for pyscaffold 4
 
 Version 0.3
