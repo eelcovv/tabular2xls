@@ -84,13 +84,13 @@ def clean_the_cells(cells, aliases=None):
         clean_cell = clean_cell.replace("\\textbf{", "")
         clean_cell = clean_cell.replace("\\emph{", "")
         clean_cell = clean_cell.replace("\\python{", "")
+        clean_cell = clean_cell.replace("\\textemdash", "-")
         clean_cell = re.sub(r"\\hspace{.*?}", "", clean_cell)
         clean_cell = re.sub(r"\\vspace{.*?}", "", clean_cell)
         clean_cell = clean_cell.replace("}", "")
         clean_cell = clean_cell.replace("{", "")
         clean_cell = clean_cell.replace("\\", "")
         clean_cell = clean_cell.replace("--", "-")
-        clean_cell = clean_cell.replace("\\textemdash", "-")
 
         if aliases is not None:
             for alias, pattern in aliases.items():
