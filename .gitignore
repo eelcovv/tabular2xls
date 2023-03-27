@@ -52,3 +52,4 @@ MANIFEST
 .venv*/
 .conda*/
 /examples/tabellen/
+/install_exe.ps1
