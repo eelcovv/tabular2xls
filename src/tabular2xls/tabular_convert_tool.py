@@ -120,6 +120,7 @@ def main(args):
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
     write_data_to_sheet_multiindex(tabular_df, xls_filename)
+    _logger.info(f"Done!")
 
 
 def run():
