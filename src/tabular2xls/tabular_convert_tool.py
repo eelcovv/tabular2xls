@@ -10,6 +10,9 @@ from pathlib import Path
 from tabular2xls import __version__
 from tabular2xls.utils import parse_tabular, write_data_to_sheet_multiindex
 
+logging.basicConfig(
+    format='%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s',
+    level=logging.WARNING)
 _logger = logging.getLogger(__name__)
 
 
