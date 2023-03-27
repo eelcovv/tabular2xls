@@ -402,55 +402,54 @@ def write_data_to_sheet_multiindex(data_df, file_name, sheet_name="Sheet"):
 
     """
 
-    writer = pd.ExcelWriter(file_name, engine="xlsxwriter")
+    with pd.ExcelWriter(file_name, engine="xlsxwriter") as writer:
 
-    data_df.to_excel(excel_writer=writer, sheet_name=sheet_name)
+        data_df.to_excel(excel_writer=writer, sheet_name=sheet_name)
 
-    ExcelFormatter.header_style = None
+        ExcelFormatter.header_style = None
 
-    workbook = writer.book
-    worksheet = writer.sheets[sheet_name]
+        workbook = writer.book
+        worksheet = writer.sheets[sheet_name]
 
-    wb = WorkBook(workbook=workbook)
+        wb = WorkBook(workbook=workbook)
 
-    n_index = 0
-    max_width = 0
-    character_width = 1
-    start_row = 0
+        n_index = 0
+        max_width = 0
+        character_width = 1
+        start_row = 0
 
-    for col_idx, index_name in enumerate(data_df.index.names):
-        col_width = get_max_width(data_frame=data_df, name=index_name, index=True)
-        _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
-        align = wb.left_align
-        worksheet.set_column(col_idx, col_idx, col_width * character_width, cell_format=align)
-        worksheet.write(start_row, col_idx, index_name, wb.header_format)
+        for col_idx, index_name in enumerate(data_df.index.names):
+            col_width = get_max_width(data_frame=data_df, name=index_name, index=True)
+            _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
+            align = wb.left_align
+            worksheet.set_column(col_idx, col_idx, col_width * character_width, cell_format=align)
+            worksheet.write(start_row, col_idx, index_name, wb.header_format)
 
-        for value in data_df.index.get_level_values(index_name):
-            found_color_name = find_color_name(value)
-            if found_color_name is not None:
-                _logger.info(f"Going to set {value} {found_color_name}")
+            for value in data_df.index.get_level_values(index_name):
+                found_color_name = find_color_name(value)
+                if found_color_name is not None:
+                    _logger.info(f"Going to set {value} {found_color_name}")
 
-        n_index += 1
+            n_index += 1
 
-    for col_idx, column_name in enumerate(data_df.columns):
-        col_width = get_max_width(data_frame=data_df, name=column_name, index=False)
-        _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
-        align = wb.left_align
-        col_idx2 = col_idx + n_index
-        worksheet.set_column(col_idx2, col_idx2, col_width * character_width, cell_format=align)
-        worksheet.write(start_row, col_idx2, column_name, wb.header_format)
+        for col_idx, column_name in enumerate(data_df.columns):
+            col_width = get_max_width(data_frame=data_df, name=column_name, index=False)
+            _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
+            align = wb.left_align
+            col_idx2 = col_idx + n_index
+            worksheet.set_column(col_idx2, col_idx2, col_width * character_width, cell_format=align)
+            worksheet.write(start_row, col_idx2, column_name, wb.header_format)
 
-        for idx, value in enumerate(data_df[column_name]):
-            found_color_name = find_color_name(value)
-            if found_color_name is not None:
-                _logger.info(f"Going to set {value} {found_color_name}")
-                cell_format = wb.set_format(found_color_name)
-                new_value = value.replace(found_color_name, "")
-                if cell_format is not None:
-                    worksheet.write(idx + 1, col_idx2, new_value, cell_format)
-                else:
-                    _logger
-                    worksheet.write(idx + 1, col_idx2, new_value)
+            for idx, value in enumerate(data_df[column_name]):
+                found_color_name = find_color_name(value)
+                if found_color_name is not None:
+                    _logger.info(f"Going to set {value} {found_color_name}")
+                    cell_format = wb.set_format(found_color_name)
+                    new_value = value.replace(found_color_name, "")
+                    if cell_format is not None:
+                        worksheet.write(idx + 1, col_idx2, new_value, cell_format)
+                    else:
+                        _logger
+                        worksheet.write(idx + 1, col_idx2, new_value)
 
-    writer.save()
     _logger.info("Done")
