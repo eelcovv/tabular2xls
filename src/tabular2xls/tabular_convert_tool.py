@@ -10,9 +10,6 @@ from pathlib import Path
 from tabular2xls import __version__
 from tabular2xls.utils import parse_tabular, write_data_to_sheet_multiindex
 
-logging.basicConfig(
-    format='%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s',
-    level=logging.WARNING)
 _logger = logging.getLogger(__name__)
 
 
@@ -74,7 +71,7 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
-    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
+    logformat='%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s'
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
