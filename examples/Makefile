@@ -7,7 +7,11 @@ targets_cat_en_test=$(tabellen_dir)/categorieen_en_testen_tabular.xlsx
 depends_score_cate=score_categorieen_tabular.tex
 targets_score_cat=$(tabellen_dir)/score_categorieen_tabular.xlsx
 
-targets = $(targets_cat_en_test) $(targets_score_cat)
+# scandata tabellen
+depends_scandata=scan_data_tabular.tex
+targets_scandata=$(tabellen_dir)/scan_data_tabular.xlsx
+
+targets = $(targets_cat_en_test) $(targets_score_cat) $(targets_scandata)
 
 depends = $(settings_file) $(depends_cat_en_test) $(depends_score_cate)
 
@@ -24,6 +28,10 @@ score_cat: $(targets_score_cat)
 $(targets_score_cat): $(depends_score_cate)
 	$(executable) $(depends_score_cate) --output_filename $(targets_score_cat)
 
+scandata: $(targets_scandata)
+$(targets_scandata): $(depends_scandata)
+	$(executable) $(options) $(depends_scandata) --output_filename $(targets_scandata) \
+	--search_and_replace  "\\Checkmark:Ja"
 
 clean:
 	@$(foreach file, $(targets), test -f $(file) && rm -v $(file) || echo No $(file);)

@@ -13,6 +13,19 @@ from tabular2xls.utils import parse_tabular, write_data_to_sheet_multiindex
 _logger = logging.getLogger(__name__)
 
 
+# create a keyvalue class
+class KeyValue(argparse.Action):
+    # Constructor calling
+    def __call__(self, parser, namespace,
+                 values, option_string=None):
+        setattr(namespace, self.dest, dict())
+
+        for value in values:
+            # split it into key and value
+            key, value = value.split('=')
+            # assign into dictionary
+            getattr(namespace, self.dest)[key] = value
+
 def parse_args(args):
     """Parse command line parameters
 
@@ -38,8 +51,10 @@ def parse_args(args):
                              "door de output filenaam bepaald", metavar="OUTPUT_DIRECTORY")
     parser.add_argument("--search_and_replace",
                         help="Search en Replace patterns als je nog string wilt veranderen."
-                             "Default worden cdots en ast naar resp . en * vervangen",
-                        nargs="*", action="append")
+                             "Default worden cdots en ast naar resp . en * vervangen."
+                             "Je kan per search/replace een key/value input gegeven als "
+                             "'--search_and_replace pattern=newpattern'",
+                        nargs="*", action=KeyValue)
     parser.add_argument(
         "-v",
         "--verbose",
