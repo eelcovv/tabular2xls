@@ -31,7 +31,7 @@ $(targets_score_cat): $(depends_score_cate)
 scandata: $(targets_scandata)
 $(targets_scandata): $(depends_scandata)
 	$(executable) $(options) $(depends_scandata) --output_filename $(targets_scandata) \
-	--search_and_replace  "\\Checkmark:Ja"
+	--search_and_replace  Checkmark=Ja
 
 clean:
 	@$(foreach file, $(targets), test -f $(file) && rm -v $(file) || echo No $(file);)
