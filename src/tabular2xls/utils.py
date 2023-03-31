@@ -145,6 +145,10 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
             aliases[alias] = pattern
             _logger.debug(f"alias {alias} -> {pattern}")
 
+        # hyperref halen we weg
+        # de pattern '\\hyperref[mijnref]{content cell}' vervangen we met 'content cell'
+        clean_line = re.sub(r'\\hyperref\[.*\]{(.*)}', r"\1", clean_line)
+
         cells = clean_line.split("&")
         if len(cells) > 1:
             clean_cells = clean_the_cells(cells, aliases)

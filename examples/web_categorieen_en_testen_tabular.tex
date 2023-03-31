@@ -1,0 +1,62 @@
+% de aliassen die we gebruiken
+\newcommand{\goodbad}{\emph{good}/\emph{bad}}
+\newcommand{\goodbadother}{\emph{good}/\emph{bad}/\emph{other}}
+\newcommand{\goodbadothernt}{\emph{good}/\emph{bad}/\emph{other}/\emph{not tested}}
+\newcommand{\goodbadnt}{\emph{good}/\emph{bad}/\emph{not tested}}
+\newcommand{\goodokbadnt}{\emph{good}/\emph{ok}/\emph{bad}/\emph{not tested}}
+\newcommand{\goodbadnant}{\emph{good}/\emph{bad}/\emph{N.A.}/\emph{not tested}}
+\newcommand{\goodbadsf}{\emph{good}/\emph{bad}/\emph{server failed}}
+\newcommand{\goodbadphaseoutnt}{\emph{good}/\emph{bad}/\emph{phase out}/\emph{not tested}}
+\newcommand{\goodbadnoaddress}{\emph{good}/\emph{bad}/\emph{no address}/\emph{not tested}}
+\newcommand{\goodbadnotrouted}{\emph{good}/\emph{bad}/\emph{not routed}/\emph{not tested}}
+\newcommand{\goodbadinvalid}{\emph{good}/\emph{bad}/\emph{invalid}/\emph{not tested}}
+%! suppress = EscapeAmpersand
+%
+%
+%
+%
+\begin{cbstabular}{G{0.15\textwidth}@{}G{0.10\textwidth}
+        >{\footnotesize}L{0.32\textwidth}>{\footnotesize}L{0.28\textwidth}>{\tiny}L{0.35\textwidth}}
+    \rowcolor{white}\cornercell{\textbf{Categorie}} &\textbf{Subgroep}&  \textbf{Testomschrijving} &\textbf{Testuitkomsten}  &  \normalsize{\textbf{Variabelenaam}}\\
+    \grayhline
+    \textbf{HTTPS} &https&  HTTPS beschikbaar & \goodbadother   &  \hyperref[fig:all_web_tests_web_https_http_available_verdict]{\python{tests_web_https_http_available_verdict}} \\
+    && HTTPS-doorverwijzing &  \goodbadothernt &  \hyperref[fig:all_web_tests_web_https_http_redirect_verdict]{\python{tests_web_https_http_redirect_verdict}} \\
+    &&  HTTPS-compressie &  \goodbadnt &  \hyperref[fig:all_web_tests_web_https_http_compress_verdict]{\python{tests_web_https_http_compress_verdict}} \\
+    && HSTS aangeboden &  \goodbadothernt &  \hyperref[fig:all_web_tests_web_https_http_hsts_verdict]{\python{tests_web_https_http_hsts_verdict}} \\
+    &cert& Vertrouwensketen van certificaat & \goodbadnt  &  \hyperref[fig:all_web_tests_web_https_cert_chain_verdict]{\python{tests_web_https_cert_chain_verdict}} \\
+    && Publieke sleutel van certificaat & \goodbadnt   &  \hyperref[fig:all_web_tests_web_https_cert_pubkey_verdict]{\python{tests_web_https_cert_pubkey_verdict}} \\
+    && Handtekening van certificaat  & \goodbadnt  &  \hyperref[fig:all_web_tests_web_https_cert_sig_verdict]{\python{tests_web_https_cert_sig_verdict}} \\
+    && Domeinnaam op certificaat & \goodbadnt  &  \hyperref[fig:all_web_tests_web_https_cert_domain_verdict]{\python{tests_web_https_cert_domain_verdict}} \\
+    &tls& TLS Versie & \goodbadphaseoutnt  &  \hyperref[fig:all_web_tests_web_https_tls_version_verdict]{\python{tests_web_https_tls_version_verdict}} \\
+    && TLS ciphers & \goodbadphaseoutnt   &  \hyperref[fig:all_web_tests_web_https_tls_ciphers_verdict]{\python{tests_web_https_tls_ciphers_verdict}} \\
+    && TLS cipher-volgorde & \goodbadothernt  &  \hyperref[fig:all_web_tests_web_https_tls_cipherorder_verdict]{\python{tests_web_https_tls_cipherorder_verdict}} \\
+    && TLS sleuteluitwisselingsparameters & \goodbadphaseoutnt   &  \hyperref[fig:all_web_tests_web_https_tls_keyexchange_verdict]{\python{tests_web_https_tls_keyexchange_verdict}} \\
+    && Hashfunctie voor sleuteluitwisseling &  \goodbadphaseoutnt  &  \hyperref[fig:all_web_tests_web_https_tls_keyexchangehash_verdict]{\python{tests_web_https_tls_keyexchangehash_verdict}} \\
+    && TLS-compressie &  \goodbadnt  &  \hyperref[fig:all_web_tests_web_https_tls_compress_verdict]{\python{tests_web_https_tls_compress_verdict}} \\
+    && \emph{Secure renegotiation} & \goodbadnt &  \hyperref[fig:all_web_tests_web_https_tls_secreneg_verdict]{\python{tests_web_https_tls_secreneg_verdict}} \\
+    && \emph{Client initiated renegotiation}& \goodbadnt &  \hyperref[fig:all_web_tests_web_https_tls_clientreneg_verdict]{\python{tests_web_https_tls_clientreneg_verdict}} \\
+    && 0-RTT &  \goodbadnant  &  \hyperref[fig:all_web_tests_web_https_tls_0rtt_verdict]{\python{tests_web_https_tls_0rtt_verdict}} \\
+    && TLS OCSP-stapeling & \goodokbadnt  &  \hyperref[fig:all_web_tests_web_https_tls_ocsp_verdict]{\python{tests_web_https_tls_ocsp_verdict}} \\
+    &dane& DANE aanwezig  & \goodbadnt  &  \hyperref[fig:all_web_tests_web_https_dane_exist_verdict]{\python{tests_web_https_dane_exist_verdict}} \\
+    && DANE geldigheid  & \goodbadnt  &  \hyperref[fig:all_web_tests_web_https_dane_valid_verdict]{\python{tests_web_https_dane_valid_verdict}} \\
+    \grayhline
+    \textbf{IPv6} &ipv6&  IPv6-adressen voor \emph{nameservers} & \goodbadother &    \hyperref[fig:all_web_tests_web_ipv6_ns_address_verdict]{\python{tests_web_ipv6_ns_address_verdict}} \\
+    &&  IPv6-bereikbaarheid van \emph{nameservers}&  \goodbadnt & \hyperref[fig:all_web_tests_web_ipv6_ns_reach_verdict]{\python{tests_web_ipv6_ns_reach_verdict}} \\
+    &&  IPv6-adressen voor \emph{webserver} & \goodbad  &  \hyperref[fig:all_web_tests_web_ipv6_ws_address_verdict]{\python{tests_web_ipv6_ws_address_verdict}} \\
+    &&  IPv6-bereikbaarheid van \emph{webservers} & \goodbadnt   & \hyperref[fig:all_web_tests_web_ipv6_ws_reach_verdict]{\python{tests_web_ipv6_ws_reach_verdict}} \\
+    && Gelijke website op IPv6 en IPv4 & \goodbadnt  & \hyperref[fig:all_web_tests_web_ipv6_ws_similar_verdict]{\python{tests_web_ipv6_ws_similar_verdict}} \\
+    \grayhline
+    \textbf{DNSSEC} &dnssec& DNSSEC aanwezig  &  \goodbadsf &  \hyperref[fig:all_web_tests_web_dnssec_exist_verdict]{\python{tests_web_dnssec_exist_verdict}} \\
+    && DNSSEC geldigheid & \goodbadnt  &  \hyperref[fig:all_web_tests_web_dnssec_valid_verdict]{\python{tests_web_dnssec_valid_verdict}} \\
+    \grayhline
+    \textbf{Beveiligings-}
+    &appsec& \emph{X-Frame-options} & \goodbadphaseoutnt  &  \hyperref[fig:all_web_tests_web_appsecpriv_x_frame_options_verdict]{\python{tests_web_appsecpriv_x_frame_options_verdict}} \\
+    \textbf{opties} && \emph{X-Content-Type-Options}&  \goodbadphaseoutnt &  \hyperref[fig:all_web_tests_web_appsecpriv_x_content_type_options_verdict]{\python{tests_web_appsecpriv_x_content_type_options_verdict}} \\
+    && \emph{Content-Security-Policy} & \goodbadnt  &  \hyperref[fig:all_web_tests_web_appsecpriv_csp_verdict]{\python{tests_web_appsecpriv_csp_verdict}} \\
+    && \emph{Referrer-Policy} aanwezig & \goodbadnt  &  \hyperref[fig:all_web_tests_web_appsecpriv_referrer_policy_verdict]{\python{tests_web_appsecpriv_referrer_policy_verdict}} \\
+    \grayhline
+    \textbf{RPKI} &rpki&  Route Oorsprong Autorisatie bestaat  &\goodbadnoaddress &    \hyperref[fig:all_web_tests_web_rpki_exists_verdict]{\python{tests_web_rpki_exists_verdict}} \\
+    & & Route Oorsprong Autorisatie is geldig &\goodbadnotrouted &    \hyperref[fig:all_web_tests_web_rpki_valid_verdict]{\python{tests_web_rpki_valid_verdict}} \\
+    & & RPKI voor nameserver bestaat &\goodbadnoaddress &    \hyperref[fig:all_web_tests_web_ns_rpki_exists_verdict]{\python{tests_web_ns_rpki_exists_verdict}} \\
+    & & RPKI voor nameserver is geldig &\goodbadinvalid &    \hyperref[fig:all_web_tests_web_ns_rpki_valid_verdict]{\python{tests_web_ns_rpki_valid_verdict}} \\
+\end{cbstabular}
