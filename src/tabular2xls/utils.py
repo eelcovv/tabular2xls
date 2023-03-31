@@ -273,7 +273,9 @@ class WorkBook:
             'font': "arial",
             'align': 'left',
             'font_size': 8,
-            'border': 0
+            'border': 0,
+            'bottom': 0,
+            'top': 0,
         })
         self.left_align_large_wrap = self.workbook.add_format({
             'font': "arial",
@@ -369,7 +371,7 @@ def update_width(label, max_width):
 
 
 def get_max_width(data_frame, name, index=False):
-    """ bepaal de maximale string in een index of column """
+    """ Bepaal de maximale string in een index of column """
     max_col_width = len(name)
     if index:
         values = data_frame.index.get_level_values(name)
@@ -399,7 +401,7 @@ def write_data_to_sheet_multiindex(data_df, file_name, sheet_name="Sheet"):
     Parameters
     ----------
     data_df: pd.DataFrame
-        De data die we naar excel scrhijven
+        De data die we naar excel schrijven
     file_name: str
     sheet_name: str
         De sheet name
