@@ -125,7 +125,7 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
     """
 
     _logger.debug(f"Reading file {input_filename}")
-    with open(input_filename, "r") as fp:
+    with open(input_filename, "r", encoding="utf-8") as fp:
         lines = fp.readlines()
     rows = list()
     header_row = None
