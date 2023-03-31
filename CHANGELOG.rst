@@ -2,9 +2,10 @@
 Changelog
 =========
 
-Version 0.3.3
+Version 0.3.4
 =============
 - tabular nu met encoding utf-8 ingeladen
+- hyperref[link]{content} wordt nu vervangen met content
 
 Version 0.3.2
 =============
