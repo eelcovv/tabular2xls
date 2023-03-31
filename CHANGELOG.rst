@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.3.3
+=============
+- tabular nu met encoding utf-8 ingeladen
+
 Version 0.3.2
 =============
 - cbs kleuren worden herkend en vertaald
