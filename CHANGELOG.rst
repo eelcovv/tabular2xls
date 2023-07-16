@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.3.5
+=============
+- Nieuwe optie 'merge_top_row' om multirow toprij goed te processen
+
 Version 0.3.4
 =============
 - tabular nu met encoding utf-8 ingeladen
