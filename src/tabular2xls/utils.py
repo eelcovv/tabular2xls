@@ -105,7 +105,7 @@ def clean_the_cells(cells, aliases=None):
     return clean_cells
 
 
-def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
+def parse_tabular(input_filename, multi_index=False, search_and_replace=None, top_row_merge=False):
     """
     read the tabular file and convert contents to a data frame
 
@@ -115,6 +115,8 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
         Name of the tex tabular file
     multi_index: bool
         Converteer de index in een multi index op basis van de eerste 2 kolommen
+    top_row_merge: bool
+        Converteer de bovenste rij naar een multi top rij
     search_and_replace:
         dict met search and replace strings
 
@@ -171,6 +173,22 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
         table_df.index = table_df.index.rename(["", ""])
     else:
         table_df = pd.DataFrame.from_records(rows, columns=header_row)
+
+    if top_row_merge:
+        # De eerste rij beschouwen als een multi column. Fix dat
+        table_df = table_df.T.reset_index()
+        first_two_columns = table_df.columns[:2].to_list()
+        table_df = table_df.set_index(first_two_columns)
+        table_df.index = table_df.index.rename(["", ""])
+        table_df = table_df.T
+        first_single_col = table_df.columns[:1].to_list()
+        name = first_single_col[0][1]
+        table_df.set_index(first_single_col, drop=True, inplace=True)
+        table_df.index = table_df.index.rename(name)
+        top_name = table_df.columns[0][0]
+        new_columns = ["/".join([top_name, mc[1]]) for mc in table_df.columns]
+        table_df.columns = new_columns
+    else:
         table_df.set_index(first_col, drop=True, inplace=True)
 
     for alias, pattern in aliases.items():
@@ -372,6 +390,8 @@ def update_width(label, max_width):
 
 def get_max_width(data_frame, name, index=False):
     """ Bepaal de maximale string in een index of column """
+    if name is None:
+        return 0
     max_col_width = len(name)
     if index:
         values = data_frame.index.get_level_values(name)
@@ -388,9 +408,12 @@ def get_max_width(data_frame, name, index=False):
 def find_color_name(value: str):
     found_color = None
     for color_name in ALL_COLORS:
-        if value.startswith(color_name):
-            found_color = color_name
-            break
+        try:
+            if value.startswith(color_name):
+                found_color = color_name
+                break
+        except AttributeError:
+            continue
     return found_color
 
 

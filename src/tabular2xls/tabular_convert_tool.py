@@ -26,6 +26,7 @@ class KeyValue(argparse.Action):
             # assign into dictionary
             getattr(namespace, self.dest)[key] = value
 
+
 def parse_args(args):
     """Parse command line parameters
 
@@ -77,6 +78,12 @@ def parse_args(args):
         help="Forceer een multiindex dataframe",
         action="store_true",
     )
+
+    parser.add_argument(
+        "--top_row_merge",
+        help="Forceer dat we de bovenste rij als een multirow beschouwen",
+        action="store_true",
+    )
     return parser.parse_args(args)
 
 
@@ -86,7 +93,7 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
-    logformat='%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s'
+    logformat = '%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s'
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
@@ -130,7 +137,8 @@ def main(args):
 
     _logger.info(f"Converting {filename} ->> {xls_filename}")
     tabular_df = parse_tabular(input_filename=filename, multi_index=args.multi_index,
-                               search_and_replace=search_and_replace)
+                               search_and_replace=search_and_replace,
+                               top_row_merge=args.top_row_merge)
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
