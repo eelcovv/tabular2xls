@@ -5,6 +5,7 @@ Changelog
 Version 0.3.5
 =============
 - Nieuwe optie 'merge_top_row' om multirow toprij goed te processen
+- Bugfix op multiindex plus nieuw voorbeeld
 
 Version 0.3.4
 =============
