@@ -15,6 +15,9 @@ targets_cat_en_test=$(tabellen_dir)/categorieen_en_testen_tabular.xlsx
 depends_score_cate=score_categorieen_tabular.tex
 targets_score_cat=$(tabellen_dir)/score_categorieen_tabular.xlsx
 
+depends_om_of_rechter=om_of_rechter_tabular.tex
+targets_om_of_rechter=$(tabellen_dir)/om_of_rechter_tabular.xlsx
+
 # scandata tabellen
 depends_scandata=scan_data_tabular.tex
 targets_scandata=$(tabellen_dir)/scan_data_tabular.xlsx
@@ -25,7 +28,7 @@ depends = $(settings_file) $(depends_cat_en_test) $(depends_score_cate)
 
 default: all
 
-all: cat_en_test score_cat ransomware
+all: cat_en_test score_cat ransomware om_of_rechter
 
 ransomware_gehad: $(targets_ransomware_gehad)
 $(targets_ransomware_gehad): $(depends_ransomware_gehad)
@@ -40,6 +43,12 @@ ransomware: ransomware_losgeld ransomware_gehad
 cat_en_test: $(targets_cat_en_test)
 $(targets_cat_en_test): $(depends_cat_en_test)
 	$(executable) $(depends_cat_en_test) --output_filename $(targets_cat_en_test)
+
+om_of_rechter: $(targets_om_of_rechter)
+$(targets_om_of_rechter): $(depends_om_of_rechter)
+	$(executable) $(depends_om_of_rechter) --output_filename $(targets_om_of_rechter)
+
+score_cat: $(targets_score_cat)
 
 score_cat: $(targets_score_cat)
 $(targets_score_cat): $(depends_score_cate)

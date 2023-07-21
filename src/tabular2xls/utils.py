@@ -164,15 +164,16 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None, to
         else:
             _logger.debug(f"OUTSIZE : {clean_line}")
 
-    first_col = header_row[0]
+    index_columns = header_row[0]
+    empty_column_names = False
     if multi_index:
         if header_row[0] == "":
             header_row[0] = "l1"
         if header_row[1] == "":
             header_row[1] = "l2"
         table_df = pd.DataFrame.from_records(rows, columns=header_row)
-        table_df.set_index(["l1", "l2"], drop=True, inplace=True)
-        table_df.index = table_df.index.rename(["", ""])
+        index_columns = ["l1", "l2"]
+        empty_column_names = True
     else:
         table_df = pd.DataFrame.from_records(rows, columns=header_row)
 
@@ -191,7 +192,9 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None, to
         new_columns = ["/".join([top_name, mc[1]]) for mc in table_df.columns]
         table_df.columns = new_columns
     else:
-        table_df.set_index(first_col, drop=True, inplace=True)
+        table_df.set_index(index_columns, drop=True, inplace=True)
+        if empty_column_names:
+            table_df.index = table_df.index.rename(["", " "])
 
     for alias, pattern in aliases.items():
         for col_name in table_df.columns:
