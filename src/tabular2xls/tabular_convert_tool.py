@@ -16,13 +16,12 @@ _logger = logging.getLogger(__name__)
 # create a keyvalue class
 class KeyValue(argparse.Action):
     # Constructor calling
-    def __call__(self, parser, namespace,
-                 values, option_string=None):
+    def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, dict())
 
         for value in values:
             # split it into key and value
-            key, value = value.split('=')
+            key, value = value.split("=")
             # assign into dictionary
             getattr(namespace, self.dest)[key] = value
 
@@ -37,25 +36,35 @@ def parse_args(args):
     Returns:
       :obj:`argparse.Namespace`: command line parameters namespace
     """
-    parser = argparse.ArgumentParser(description="Tool om latex tabulars in xls files om te zetten")
+    parser = argparse.ArgumentParser(
+        description="Tool om latex tabulars in xls files om te zetten"
+    )
     parser.add_argument(
         "--version",
         action="version",
         version="tabular2xls {ver}".format(ver=__version__),
     )
     parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
-    parser.add_argument("--output_filename",
-                        help="Naam van de xls output file. Moet extensie .xlsx "
-                             "hebben", metavar="OUTPUT_FILENAME")
-    parser.add_argument("--output_directory",
-                        help="Naam van de output directory. Als niet gegeven wordt het"
-                             "door de output filenaam bepaald", metavar="OUTPUT_DIRECTORY")
-    parser.add_argument("--search_and_replace",
-                        help="Search en Replace patterns als je nog string wilt veranderen."
-                             "Default worden cdots en ast naar resp . en * vervangen."
-                             "Je kan per search/replace een key/value input gegeven als "
-                             "'--search_and_replace pattern=newpattern'",
-                        nargs="*", action=KeyValue)
+    parser.add_argument(
+        "--output_filename",
+        help="Naam van de xls output file. Moet extensie .xlsx " "hebben",
+        metavar="OUTPUT_FILENAME",
+    )
+    parser.add_argument(
+        "--output_directory",
+        help="Naam van de output directory. Als niet gegeven wordt het"
+        "door de output filenaam bepaald",
+        metavar="OUTPUT_DIRECTORY",
+    )
+    parser.add_argument(
+        "--search_and_replace",
+        help="Search en Replace patterns als je nog string wilt veranderen."
+        "Default worden cdots en ast naar resp . en * vervangen."
+        "Je kan per search/replace een key/value input gegeven als "
+        "'--search_and_replace pattern=newpattern'",
+        nargs="*",
+        action=KeyValue,
+    )
     parser.add_argument(
         "-v",
         "--verbose",
@@ -93,7 +102,9 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
-    logformat = '%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s'
+    logformat = (
+        "%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s"
+    )
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
@@ -133,12 +144,17 @@ def main(args):
         xls_filename = output_directory / Path(xls_file_base)
 
     if ".xlsx" not in xls_filename.suffix:
-        raise ValueError("Output filename does not have .xlsx extension. Please correct")
+        raise ValueError(
+            "Output filename does not have .xlsx extension. Please correct"
+        )
 
     _logger.info(f"Converting {filename} ->> {xls_filename}")
-    tabular_df = parse_tabular(input_filename=filename, multi_index=args.multi_index,
-                               search_and_replace=search_and_replace,
-                               top_row_merge=args.top_row_merge)
+    tabular_df = parse_tabular(
+        input_filename=filename,
+        multi_index=args.multi_index,
+        search_and_replace=search_and_replace,
+        top_row_merge=args.top_row_merge,
+    )
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
