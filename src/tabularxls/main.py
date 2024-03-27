@@ -14,6 +14,19 @@ from tabularxls.tabular_utils import parse_tabular, write_data_to_sheet_multiind
 _logger = logging.getLogger(__name__)
 
 
+# create a key-value class
+class KeyValue(argparse.Action):
+    # Constructor calling
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, dict())
+
+        for value in values:
+            # split it into key and value
+            key, value = value.split("=")
+            # assign into dictionary
+            getattr(namespace, self.dest)[key] = value
+
+
 def parse_args(args):
     """Parse command line parameters
 
@@ -48,7 +61,7 @@ def parse_args(args):
         help="Search en Replace patterns in case you want to change strings."
         "By default, cdots en ast are replaced by . and * vervangen, respectively",
         nargs="*",
-        action="append",
+        action=KeyValue,
     )
     parser.add_argument(
         "-v",
@@ -57,7 +70,7 @@ def parse_args(args):
         help="set loglevel to INFO",
         action="store_const",
         const=logging.INFO,
-        default=logging.INFO,
+        default=logging.WARNING,
     )
     parser.add_argument(
         "-vv",
@@ -72,10 +85,17 @@ def parse_args(args):
         help="Force a multiindex data frame",
         action="store_true",
     )
+
     parser.add_argument(
         "--encoding",
         help="Set the encoding of the text file. Default is utf-8",
         default="utf-8",
+    )
+
+    parser.add_argument(
+        "--top_row_merge",
+        help="Forceer dat we de bovenste rij als een multirow beschouwen",
+        action="store_true",
     )
     return parser.parse_args(args)
 
@@ -86,7 +106,9 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
-    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
+    logformat = (
+        "%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s"
+    )
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
@@ -136,11 +158,13 @@ def main(args):
         multi_index=args.multi_index,
         search_and_replace=search_and_replace,
         encoding=args.encoding,
+        top_row_merge=args.top_row_merge,
     )
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
     write_data_to_sheet_multiindex(tabular_df, xls_filename)
+    _logger.info(f"Done!")
 
 
 def run():

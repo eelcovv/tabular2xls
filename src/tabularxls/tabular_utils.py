@@ -203,6 +203,7 @@ def clean_the_cells(cells, aliases=None):
         clean_cell = clean_cell.replace("\\python{", "")
         clean_cell = clean_cell.replace("\\textemdash", "-")
         clean_cell = clean_cell.replace("\\textendash", "-")
+        clean_cell = clean_cell.replace("\\numprint{", "")
         clean_cell = re.sub(r"\\hspace{.*?}", "", clean_cell)
         clean_cell = re.sub(r"\\vspace{.*?}", "", clean_cell)
         clean_cell = clean_cell.replace("}", "")
@@ -212,7 +213,7 @@ def clean_the_cells(cells, aliases=None):
 
         if aliases is not None:
             for alias, pattern in aliases.items():
-                if re.match(alias, clean_cell):
+                if match := re.match(alias, clean_cell):
                     clean_cell = clean_cell.replace(alias, pattern)
 
         clean_cells.append(clean_cell.strip())
@@ -228,6 +229,7 @@ def parse_tabular(
     multi_index: bool = False,
     search_and_replace: Union[dict, None] = None,
     encoding: str = "utf-8",
+    top_row_merge: bool = False
 ) -> DataFrame:
     """
     Read the tabular file and convert contents to a data frame
@@ -238,6 +240,7 @@ def parse_tabular(
             False.
         search_and_replace (dict, optional): The search and replace strings stored in a dictionary. Defaults to None.
         encoding (str, optional): Encoding of the input file. Defaults to "utf-8"
+        top_row_merge (bool, optional). Merge the top rows in the rows are multirow headers
 
     Returns:
         DataFrame: The cleaned tubular data stored in a dataframe
@@ -264,6 +267,10 @@ def parse_tabular(
             aliases[alias] = pattern
             _logger.debug(f"alias {alias} -> {pattern}")
 
+        # hyperref halen we weg
+        # de pattern '\\hyperref[mijnref]{content cell}' vervangen we met 'content cell'
+        clean_line = re.sub(r"\\hyperref\[.*\]{(.*)}", r"\1", clean_line)
+
         cells = clean_line.split("&")
         if len(cells) > 1:
             clean_cells = clean_the_cells(cells, aliases)
@@ -275,18 +282,37 @@ def parse_tabular(
         else:
             _logger.debug(f"OUTSIZE : {clean_line}")
 
-    first_col = header_row[0]
+    index_columns = header_row[0]
+    empty_column_names = False
     if multi_index:
         if header_row[0] == "":
             header_row[0] = "l1"
         if header_row[1] == "":
             header_row[1] = "l2"
         table_df = pd.DataFrame.from_records(rows, columns=header_row)
-        table_df.set_index(["l1", "l2"], drop=True, inplace=True)
-        table_df.index = table_df.index.rename(["", ""])
+        index_columns = ["l1", "l2"]
+        empty_column_names = True
     else:
         table_df = pd.DataFrame.from_records(rows, columns=header_row)
-        table_df.set_index(first_col, drop=True, inplace=True)
+
+    if top_row_merge:
+        # De eerste rij beschouwen als een multi column. Fix dat
+        table_df = table_df.T.reset_index()
+        first_two_columns = table_df.columns[:2].to_list()
+        table_df = table_df.set_index(first_two_columns)
+        table_df.index = table_df.index.rename(["", ""])
+        table_df = table_df.T
+        first_single_col = table_df.columns[:1].to_list()
+        name = first_single_col[0][1]
+        table_df.set_index(first_single_col, drop=True, inplace=True)
+        table_df.index = table_df.index.rename(name)
+        top_name = table_df.columns[0][0]
+        new_columns = ["/".join([top_name, mc[1]]) for mc in table_df.columns]
+        table_df.columns = new_columns
+    else:
+        table_df.set_index(index_columns, drop=True, inplace=True)
+        if empty_column_names:
+            table_df.index = table_df.index.rename(["", " "])
 
     for alias, pattern in aliases.items():
         for col_name in table_df.columns:
@@ -630,7 +656,7 @@ def write_data_to_sheet_multiindex(
             for value in data_df.index.get_level_values(index_name):
                 found_color_name = find_color_name(value)
                 if found_color_name is not None:
-                    _logger.info(f"Going to set {value} {found_color_name}")
+                    _logger.debug(f"Going to set {value} {found_color_name}")
 
             n_index += 1
 
@@ -647,12 +673,13 @@ def write_data_to_sheet_multiindex(
             for idx, value in enumerate(data_df[column_name]):
                 found_color_name = find_color_name(value)
                 if found_color_name is not None:
-                    _logger.info(f"Going to set {value} {found_color_name}")
+                    _logger.debug(f"Going to set {value} {found_color_name}")
                     cell_format = wb.set_format(found_color_name)
                     new_value = value.replace(found_color_name, "")
                     if cell_format is not None:
                         worksheet.write(idx + 1, col_idx2, new_value, cell_format)
                     else:
+                        _logger.debug("No color found")
                         worksheet.write(idx + 1, col_idx2, new_value)
 
-    _logger.info("Done")
+    _logger.debug("Done")
