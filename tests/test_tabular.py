@@ -186,7 +186,10 @@ def test_tabular_1():
 
 def test_tabular_2():
     """API Tests"""
-    tabular_df = parse_tabular(input_filename="tabular_2.tex", multi_index=True)
+    root = get_root_directory()
+
+    tabular_file = root / Path("tests/tabular_2.tex")
+    tabular_df = parse_tabular(input_filename=tabular_file)
 
     expected_column_names = pd.Index(["2008-2013", "2014-2019 ¹⁾"], dtype="object")
 
@@ -215,7 +218,10 @@ def test_tabular_2():
 
 def test_tabular_3():
     """API Tests"""
-    tabular_df = parse_tabular(input_filename="tabular_3.tex")
+    root = get_root_directory()
+
+    tabular_file = root / Path("tests/tabular_3.tex")
+    tabular_df = parse_tabular(input_filename=tabular_file)
 
     expected_column_names = pd.Index(["Bedrijfsklasse"], dtype="object")
 
@@ -255,7 +261,11 @@ def test_tabular_3():
 
 def test_tabular_4():
     """API Tests"""
-    tabular_df = parse_tabular(input_filename="tabular_4.tex")
+
+    root = get_root_directory()
+
+    tabular_file = root / Path("tests/tabular_4.tex")
+    tabular_df = parse_tabular(input_filename=tabular_file)
 
     expected_column_names = pd.Index(["Bedrijfsgrootte"], dtype="object")
 
@@ -311,9 +321,10 @@ def test_tabular_5():
         r"\$cdot\$": ".",
         r"\$ast\$": "*",
     }
-    tabular_df = parse_tabular(
-        input_filename="tabular_5.tex", search_and_replace=s_and_r
-    )
+    root = get_root_directory()
+
+    tabular_file = root / Path("tests/tabular_5.tex")
+    tabular_df = parse_tabular(input_filename=tabular_file, search_and_replace=s_and_r)
 
     expected_column_names = pd.Index(
         ["Pilot 2015", "Onderzoek 2017", "Onderzoek 2019", "Opmerkingen"],
