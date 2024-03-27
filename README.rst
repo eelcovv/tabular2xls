@@ -3,13 +3,29 @@ tabular2xls
 ===========
 
 
-Conveteer een LaTeX tabular file naar een xls
+Convert a LaTeX tabular file to an xls file
 
 
 Description
 ===========
 
-Met deze tool kan je LaTeX tabular files naar excel converteren
+With this tool you can convert LaTeX tabular files to Excel
+
+------------
+Installation
+------------
+
+Install the tool by::
+
+    pip install tabular2xls
+
+In case you want to include CBS color definitions, install with
+
+    pip install tabular2xls[cbs]
+
+or, alternatively, install the cbsplotlib package yourself::
+
+    pip install cbsplotlib
 
 
 .. _pyscaffold-notes:
