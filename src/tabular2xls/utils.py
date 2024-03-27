@@ -227,6 +227,7 @@ def parse_tabular(
     input_filename: Union[str, Path],
     multi_index: bool = False,
     search_and_replace: Union[dict, None] = None,
+    encoding: str = "utf-8",
 ) -> DataFrame:
     """
     Read the tabular file and convert contents to a data frame
@@ -236,13 +237,14 @@ def parse_tabular(
         multi_index (bool, optional): Convert the index into a multi index based on the first 2 columns. Defaults to
             False.
         search_and_replace (dict, optional): The search and replace strings stored in a dictionary. Defaults to None.
+        encoding (str, optional): Encoding of the input file. Defaults to "utf-8"
 
     Returns:
         DataFrame: The cleaned tubular data stored in a dataframe
     """
 
     _logger.debug(f"Reading file {input_filename}")
-    with open(input_filename) as fp:
+    with open(input_filename, encoding=encoding) as fp:
         lines = fp.readlines()
     rows = list()
     header_row = None

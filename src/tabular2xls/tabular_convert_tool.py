@@ -72,6 +72,11 @@ def parse_args(args):
         help="Force a multiindex data frame",
         action="store_true",
     )
+    parser.add_argument(
+        "--encoding",
+        help="Set the encoding of the text file. Default is utf-8",
+        default="utf-8",
+    )
     return parser.parse_args(args)
 
 
@@ -130,6 +135,7 @@ def main(args):
         input_filename=filename,
         multi_index=args.multi_index,
         search_and_replace=search_and_replace,
+        encoding=args.encoding,
     )
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
