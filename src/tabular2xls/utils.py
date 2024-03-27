@@ -1,28 +1,109 @@
 import logging
 import re
 import pandas as pd
+from pandas import DataFrame
 from pandas.io.formats.excel import ExcelFormatter
-import cbsplotlib.colors as cbc
 import matplotlib.colors as mlc
+
+try:
+    import cbsplotlib
+except ImportError:
+    cbsplotlib = None
+else:
+    import cbsplotlib.colors as cbc
 
 _logger = logging.getLogger(__name__)
 
-CBS_COLORS = [c.replace("cbs:", "") for c in cbc.CBS_COLORS.keys()]
-MTL_COLORS = [c.replace("xkcd:", "") for c in mlc.get_named_colors_mapping().keys()]
-MIN_COLOR_LENGTH = 2
-# neem alleen de kleurennamen met minimaal 3 characters
-ALL_COLORS = [c for c in CBS_COLORS + MTL_COLORS if len(c) > MIN_COLOR_LENGTH]
+
+def get_color_names(min_color_length=2):
+    """
+    Get the color name definitions obtained from the matplot default list
+
+    Args:
+        min_color_length (int):  minimum length of the color names
+
+    Notes:
+        * By default, all matlotlib colors are taken
+        * In case cbsplotlib is installed, also all CBS color definitions are taken
+
+    Returns:
+        list: All the default color names
+    """
+
+    colors = [c.replace("xkcd:", "") for c in mlc.get_named_colors_mapping().keys()]
+    if cbsplotlib is not None:
+        cbs_colors = [c.replace("cbs:", "") for c in cbc.CBS_COLORS.keys()]
+        colors.extend(cbs_colors)
+    defaults_colors = [c for c in colors if len(c) > min_color_length]
+
+    return defaults_colors
 
 
-# function to convert to superscript
-def get_super(x):
+def get_color_code(color_name: str):
+    """
+    Get the code belonging to a color name
+
+    Args:
+        color_name (str):  Name of the color
+
+    Returns:
+        str: Color code
+    """
+
+    color_code = None
+
+    if cbsplotlib is not None:
+        # in case cbsplotlib is imported, first try to obtain the CBS color definition
+        try:
+            color_code = cbc.CBS_COLORS_HEX[color_name]
+        except KeyError:
+            try:
+                color_code = cbc.CBS_COLORS_HEX["cbs:" + color_name]
+            except KeyError:
+                pass
+
+    if color_code is None:
+        # if no color code has been found yet, try to obtain it from the matplotlib color definitions
+        try:
+            color_code = mlc.get_named_colors_mapping()[color_name]
+        except KeyError:
+            _logger.info(f"Could find a value for the color name  '{color_name}'")
+
+    return color_code
+
+
+def get_super(content):
+    """
+    Convert normal characters to superscript codes
+
+    Args:
+        content (str): The string for which all characters need to be converted
+
+    Returns:
+        superscript_content (str): New string in only superscript characters
+    """
+
     normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
     super_s = "ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖ۹ʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾"
-    res = x.maketrans("".join(normal), "".join(super_s))
-    return x.translate(res)
+    translations = content.maketrans("".join(normal), "".join(super_s))
+    superscript_content = content.translate(translations)
+    return superscript_content
 
 
 def replace_textsuper(cell):
+    """
+    Replace LaTeX textsuperscript characters with superscript characters
+
+    Args:
+        cell (str): Cell contents for which the textsuperscript needs to be translated into superscript
+
+    Notes:
+        * Superscript in LaTeX is given with the *\\textsuperscript{}* command
+
+    Returns:
+        new_cell (str): Cell contents with all superscript translated into superscript characters
+
+    """
     if match := re.search("\\\\textsuperscript{(.*?)}", cell):
         content = match.group(1)
         content = clean_the_cells([content])[0]
@@ -34,6 +115,15 @@ def replace_textsuper(cell):
 
 
 def get_multicolumns(clean_cell):
+    """
+    Get the cell contents of a multicolumn cell
+
+    Args:
+        clean_cell (str):  Cell contents of a multicolumn cell
+
+    Returns:
+        first_cell (str), n_col (int): The contents of the first cell and the number of following multicolumn cells
+    """
     if match := re.search("\\\\multicolumn{(.*?)}", clean_cell):
         n_col = int(match.group(1))
         new_match = re.sub("\\\\multicolumn{(.*?)}", "", clean_cell)
@@ -45,6 +135,16 @@ def get_multicolumns(clean_cell):
 
 
 def get_new_command(line):
+    """
+    Get the contents of a LaTeX newcommand definition
+
+    Args:
+        line (str):  Line potentially containing a newcommand definition
+
+    Returns:
+
+    """
+
     parse_alias = True
     alias = list()
     pattern = list()
@@ -73,7 +173,18 @@ def get_new_command(line):
 
 
 def clean_the_cells(cells, aliases=None):
-    """remove all spurious latex code from cell contents"""
+    """
+    Remove all spurious latex code from cell contents
+
+    Args:
+        cells (list): List of cells containing strings to be cleaned
+        aliases (dict, optional): If aliases are passed (default None), all strings will be cleaned with the
+            replacements defined in the aliases
+
+    Returns:
+        list: The new cell contents
+    """
+
     clean_cells = list()
     for cell in cells:
         clean_cell = replace_textsuper(cell)
@@ -109,19 +220,14 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
     """
     read the tabular file and convert contents to a data frame
 
-    Parameters
-    ----------
-    input_filename: str or Path
-        Name of the tex tabular file
-    multi_index: bool
-        Converteer de index in een multi index op basis van de eerste 2 kolommen
-    search_and_replace:
-        dict met search and replace strings
+    Args:
+        input_filename (str or Path): Name of the LaTeX tabular file.
+        multi_index (bool, optional): Convert the index into a multi index based on the first 2 columns. Defaults to
+            False.
+        search_and_replace (dict, optional): The search and replace strings stored in a dictionary. Defaults to None.
 
-    Returns
-    -------
-    tabular_df: pd.DataFrame
-        Dataframe of the tabular
+    Returns:
+        DataFrame: The cleaned tubular data stored in a dataframe
     """
 
     _logger.debug(f"Reading file {input_filename}")
@@ -187,7 +293,37 @@ def parse_tabular(input_filename, multi_index=False, search_and_replace=None):
 
 
 class WorkBook:
+    """
+    This class is responsible for working with Excel data
+    Args:
+        workbook:  Excel workbook object to modify
+
+    Attributes:
+        left_align_italic (workbook format or None)
+        left_align_italic_large (workbook format or None)
+        left_align_italic_large_ul (workbook format or None) : setup for workbook
+        left_align_helvetica (workbook format or None) : setup for workbook
+        left_align_helvetica_bold (workbook format or None) : setup for workbook
+        left_align_bold (workbook format or None) : setup for workbook
+        left_align_bold_large (workbook format or None) : setup for workbook
+        left_align_bold_larger (workbook format or None) : setup for workbook
+        left_align (workbook format or None) : setup for workbook
+        left_align_large_wrap (workbook format or None) : setup for workbook
+        left_align_large_wrap_top (workbook format or None) : setup for workbook
+        left_align_wrap (workbook format or None) : setup for workbook
+        left_align_large (workbook format or None) : setup for workbook
+        right_align (workbook format or None) : setup for workbook
+        header_format (workbook format or None) : setup for workbook
+        title_format (workbook format or None) : setup for workbook
+        section_heading (workbook format or None) : setup for workbook
+        footer_format (workbook format or None) : setup for workbook
+    """
+
     def __init__(self, workbook):
+        """
+        Constructor of the Workbook class
+        """
+
         self.workbook = workbook
         self.left_align_italic = None
         self.left_align_italic_large = None
@@ -210,6 +346,9 @@ class WorkBook:
         self.add_styles()
 
     def add_styles(self):
+        """
+        Add all the styles to this workbook
+        """
         self.left_align_helvetica = self.workbook.add_format(
             {"font": "helvetica", "align": "left", "font_size": 8, "border": 0}
         )
@@ -349,20 +488,21 @@ class WorkBook:
         self.footer_format.set_top()
 
     def set_format(self, color_name):
+        """
+        Add color codes to the workbook style
 
-        color_code = None
-        try:
-            color_code = cbc.CBS_COLORS_HEX[color_name]
-        except KeyError:
-            try:
-                color_code = cbc.CBS_COLORS_HEX["cbs:" + color_name]
-            except KeyError:
-                try:
-                    color_code = mlc.get_named_colors_mapping()[color_name]
-                except KeyError:
-                    _logger.warning(f"kleur {color_name} niet gevonden")
+        Args:
+            color_name (str):  Name of the color to add to this workbook
+
+        Returns:
+            str: Cell format with the color code definition assigned to it
+
+        """
+
+        color_code = get_color_code(color_name)
 
         if color_code is not None:
+            # a color code was found. add it as a definition to the work book
             cell_format = self.workbook.add_format({"font_size": 8})
             cell_format.set_font_color(color_code)
 
@@ -372,20 +512,42 @@ class WorkBook:
         return cell_format
 
 
-def update_width(label, max_width):
+def update_width(label, max_width=None):
+    """
+    Update the width of the current max_width based on the contents of the label
+
+    Args:
+        label (str): Label to check if its width a wider than max_width
+        max_width (int or None): Current maximum width
+
+    Returns:
+        int: Maximum width encountered so far
+    """
+
     width = len(label)
-    if width > max_width:
+    if max_width is None or width > max_width:
         max_width = width
     return max_width
 
 
-def get_max_width(data_frame, name, index=False):
-    """bepaal de maximale string in een index of column"""
+def get_max_width(input_data, name, index=False):
+    """
+    Determine the maximum string in an index or column of a Dataframe
+
+    Args:
+        input_data (DataFrame):  The dataframe to check
+        name (str): Name of the column to check
+        index (bool, optional): If true, check the maximum width of the index. Defaults to False.
+
+    Returns:
+        int: The maximum width of this column or index
+
+    """
     max_col_width = len(name)
     if index:
-        values = data_frame.index.get_level_values(name)
+        values = input_data.index.get_level_values(name)
     else:
-        values = data_frame[name]
+        values = input_data[name]
     for value in values:
         col_width = len(str(value))
         if col_width > max_col_width:
@@ -394,10 +556,22 @@ def get_max_width(data_frame, name, index=False):
     return max_col_width
 
 
-def find_color_name(value: str):
+def find_color_name(line: str, minimal_color_length=2):
+    """
+    Find the color name of a str
+
+    Args:
+        line (str): Line in which to find the color name
+        minimal_color_length (int): Minimum color length
+
+    Returns:
+        str: The color found int the line
+
+    """
     found_color = None
-    for color_name in ALL_COLORS:
-        if value.startswith(color_name):
+    default_colors = get_color_names(min_color_length=minimal_color_length)
+    for color_name in default_colors:
+        if line.startswith(color_name):
             found_color = color_name
             break
     return found_color
@@ -405,15 +579,12 @@ def find_color_name(value: str):
 
 def write_data_to_sheet_multiindex(data_df, file_name, sheet_name="Sheet"):
     """
-    Schrijf de data naar excel file met format
+    Write the data to Excel file with format
 
-    Parameters
-    ----------
-    data_df: pd.DataFrame
-        De data die we naar excel scrhijven
-    file_name: str
-    sheet_name: str
-        De sheet name
+     Args:
+         data_df (DataFrame): The dataframe to write to Excel
+         file_name (str): Name of the Excel file with format
+         sheet_name (str): Name of the sheet to write to
 
     """
 
@@ -429,12 +600,11 @@ def write_data_to_sheet_multiindex(data_df, file_name, sheet_name="Sheet"):
     wb = WorkBook(workbook=workbook)
 
     n_index = 0
-    max_width = 0
     character_width = 1
     start_row = 0
 
     for col_idx, index_name in enumerate(data_df.index.names):
-        col_width = get_max_width(data_frame=data_df, name=index_name, index=True)
+        col_width = get_max_width(input_data=data_df, name=index_name, index=True)
         _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
         align = wb.left_align
         worksheet.set_column(
@@ -450,7 +620,7 @@ def write_data_to_sheet_multiindex(data_df, file_name, sheet_name="Sheet"):
         n_index += 1
 
     for col_idx, column_name in enumerate(data_df.columns):
-        col_width = get_max_width(data_frame=data_df, name=column_name, index=False)
+        col_width = get_max_width(input_data=data_df, name=column_name)
         _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
         align = wb.left_align
         col_idx2 = col_idx + n_index
