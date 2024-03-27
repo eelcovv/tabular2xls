@@ -23,7 +23,9 @@ Version 0.2
 ===========
 
 - Unit test added
-- Suppressed regex warningVersion 0.1
+- Suppressed regex warning
+
+Version 0.1
 ===========
 
 - Initial design of the tool
