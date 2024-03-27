@@ -4,7 +4,7 @@ import numpy as np
 import pandas.testing as pt
 import numpy.testing as nt
 
-from tabular2xls.utils import get_super, replace_textsuper
+from tabular2xls.tabular_utils import get_super, replace_textsuper
 
 
 def test_get_super():

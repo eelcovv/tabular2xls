@@ -4,7 +4,7 @@ import numpy as np
 import pandas.testing as pt
 import numpy.testing as nt
 
-from tabular2xls.tabular_convert_tool import parse_tabular
+from tabular2xls.main import parse_tabular
 
 
 def get_root_directory():

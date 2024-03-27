@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from tabular2xls import __version__
-from tabular2xls.utils import parse_tabular, write_data_to_sheet_multiindex
+from tabular2xls.tabular_utils import parse_tabular, write_data_to_sheet_multiindex
 
 _logger = logging.getLogger(__name__)
 
