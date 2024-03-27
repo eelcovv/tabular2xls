@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version 0.4.1
+Version 0.4.2
 =============
 - Add read the docs documentation and published on pypi
 - Removed mandatory dependency on cbsplotlib
