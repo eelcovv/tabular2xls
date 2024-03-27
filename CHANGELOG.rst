@@ -2,34 +2,28 @@
 Changelog
 =========
 
-Version 0.3.5
+Version 0.4.1
 =============
-- Nieuwe optie 'merge_top_row' om multirow toprij goed te processen
-- Bugfix op multiindex plus nieuw voorbeeld
-
-Version 0.3.4
-=============
-- tabular nu met encoding utf-8 ingeladen
-- hyperref[link]{content} wordt nu vervangen met content
+- Add read the docs documentation and published on pypi
+- Removed mandatory dependency on cbsplotlib
+- Included extra unit test
 
 Version 0.3.2
 =============
-- cbs kleuren worden herkend en vertaald
+- CBS colors are recognized and translated
 - update setup for pyscaffold 4
 
 Version 0.3
 ===========
 
-- Mogelijkheid om search/replace patterns mee te geven
-- Per default worden $\cdot$ door '.' vervangen en $\ast$ door '*'
+- Possibility to specify search/replace patterns
+- By default, $\cdot$ is replaced by '.' replace and $\ast$ with '*'
 
 Version 0.2
 ===========
 
-- Unit test toegevoegd
-- Waarschuwing regex onderdrukt
-
-Version 0.1
+- Unit test added
+- Suppressed regex warningVersion 0.1
 ===========
 
-- Eerste opzet van de tool
+- Initial design of the tool

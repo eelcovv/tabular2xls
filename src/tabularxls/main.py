@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-tool om latex tabular files in xls om te zetten
+Tool to convert a LaTeX tabular file into an Excel-file
 """
 
 import argparse
@@ -7,23 +8,10 @@ import logging
 import sys
 from pathlib import Path
 
-from tabular2xls import __version__
-from tabular2xls.utils import parse_tabular, write_data_to_sheet_multiindex
+from tabularxls import __version__
+from tabularxls.tabular_utils import parse_tabular, write_data_to_sheet_multiindex
 
 _logger = logging.getLogger(__name__)
-
-
-# create a keyvalue class
-class KeyValue(argparse.Action):
-    # Constructor calling
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, dict())
-
-        for value in values:
-            # split it into key and value
-            key, value = value.split("=")
-            # assign into dictionary
-            getattr(namespace, self.dest)[key] = value
 
 
 def parse_args(args):
@@ -37,33 +25,30 @@ def parse_args(args):
       :obj:`argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
-        description="Tool om latex tabulars in xls files om te zetten"
+        description="Tool to convert latex tabulars into xls files"
     )
     parser.add_argument(
         "--version",
         action="version",
-        version="tabular2xls {ver}".format(ver=__version__),
+        version="tabularxls {ver}".format(ver=__version__),
     )
     parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
     parser.add_argument(
         "--output_filename",
-        help="Naam van de xls output file. Moet extensie .xlsx " "hebben",
+        help="Name of the xls output file. Must have extension .xlsx",
         metavar="OUTPUT_FILENAME",
     )
     parser.add_argument(
         "--output_directory",
-        help="Naam van de output directory. Als niet gegeven wordt het"
-        "door de output filenaam bepaald",
+        help="Name of the output directory. If not given, it is determined by the output file name",
         metavar="OUTPUT_DIRECTORY",
     )
     parser.add_argument(
         "--search_and_replace",
-        help="Search en Replace patterns als je nog string wilt veranderen."
-        "Default worden cdots en ast naar resp . en * vervangen."
-        "Je kan per search/replace een key/value input gegeven als "
-        "'--search_and_replace pattern=newpattern'",
+        help="Search en Replace patterns in case you want to change strings."
+        "By default, cdots en ast are replaced by . and * vervangen, respectively",
         nargs="*",
-        action=KeyValue,
+        action="append",
     )
     parser.add_argument(
         "-v",
@@ -72,7 +57,7 @@ def parse_args(args):
         help="set loglevel to INFO",
         action="store_const",
         const=logging.INFO,
-        default=logging.WARNING,
+        default=logging.INFO,
     )
     parser.add_argument(
         "-vv",
@@ -84,14 +69,13 @@ def parse_args(args):
     )
     parser.add_argument(
         "--multi_index",
-        help="Forceer een multiindex dataframe",
+        help="Force a multiindex data frame",
         action="store_true",
     )
-
     parser.add_argument(
-        "--top_row_merge",
-        help="Forceer dat we de bovenste rij als een multirow beschouwen",
-        action="store_true",
+        "--encoding",
+        help="Set the encoding of the text file. Default is utf-8",
+        default="utf-8",
     )
     return parser.parse_args(args)
 
@@ -102,9 +86,7 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
-    logformat = (
-        "%(asctime)s %(filename)25s[%(lineno)4s] - %(levelname)-8s : %(message)s"
-    )
+    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(
         level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
     )
@@ -114,7 +96,7 @@ def main(args):
     """Wrapper allowing :func:`fib` to be called with string arguments in a CLI fashion
 
     Instead of returning the value from :func:`fib`, it prints the result to the
-    ``stdout`` in a nicely formated message.
+    ``stdout`` in a nicely formatted message.
 
     Args:
       args (List[str]): command line parameters as list of strings
@@ -153,13 +135,12 @@ def main(args):
         input_filename=filename,
         multi_index=args.multi_index,
         search_and_replace=search_and_replace,
-        top_row_merge=args.top_row_merge,
+        encoding=args.encoding,
     )
 
     xls_filename.parent.mkdir(exist_ok=True, parents=True)
     _logger.debug(f"Writing to {xls_filename}")
     write_data_to_sheet_multiindex(tabular_df, xls_filename)
-    _logger.info(f"Done!")
 
 
 def run():
