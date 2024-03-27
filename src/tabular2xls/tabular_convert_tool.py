@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tool to convert a LaTeX tabular file into an Excel-file
 """
@@ -24,7 +25,7 @@ def parse_args(args):
       :obj:`argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
-        description="Tool om latex tabulars in xls files om te zetten"
+        description="Tool to convert latex tabulars into xls files"
     )
     parser.add_argument(
         "--version",
@@ -34,19 +35,18 @@ def parse_args(args):
     parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
     parser.add_argument(
         "--output_filename",
-        help="Naam van de xls output file. Moet extensie .xlsx " "hebben",
+        help="Name of the xls output file. Must have extension .xlsx",
         metavar="OUTPUT_FILENAME",
     )
     parser.add_argument(
         "--output_directory",
-        help="Naam van de output directory. Als niet gegeven wordt het"
-        "door de output filenaam bepaald",
+        help="Name of the output directory. If not given, it is determined by the output file name",
         metavar="OUTPUT_DIRECTORY",
     )
     parser.add_argument(
         "--search_and_replace",
-        help="Search en Replace patterns als je nog string wilt veranderen."
-        "Default worden cdots en ast naar resp . en * vervangen",
+        help="Search en Replace patterns in case you want to change strings."
+        "By default,  cdots en ast are replaced by . and * vervangen, respectively",
         nargs="*",
         action="append",
     )
@@ -69,7 +69,7 @@ def parse_args(args):
     )
     parser.add_argument(
         "--multi_index",
-        help="Forceer een multiindex dataframe",
+        help="Force a multiindex data frame",
         action="store_true",
     )
     return parser.parse_args(args)
@@ -91,7 +91,7 @@ def main(args):
     """Wrapper allowing :func:`fib` to be called with string arguments in a CLI fashion
 
     Instead of returning the value from :func:`fib`, it prints the result to the
-    ``stdout`` in a nicely formated message.
+    ``stdout`` in a nicely formatted message.
 
     Args:
       args (List[str]): command line parameters as list of strings
