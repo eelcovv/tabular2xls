@@ -8,8 +8,8 @@ import logging
 import sys
 from pathlib import Path
 
-from tabular2xls import __version__
-from tabular2xls.tabular_utils import parse_tabular, write_data_to_sheet_multiindex
+from tabularxls import __version__
+from tabularxls.tabular_utils import parse_tabular, write_data_to_sheet_multiindex
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def parse_args(args):
     parser.add_argument(
         "--version",
         action="version",
-        version="tabular2xls {ver}".format(ver=__version__),
+        version="tabularxls {ver}".format(ver=__version__),
     )
     parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
     parser.add_argument(

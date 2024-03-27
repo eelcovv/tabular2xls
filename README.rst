@@ -1,6 +1,6 @@
-===========
-tabular2xls
-===========
+==========
+tabularxls
+==========
 
 
 Convert a LaTeX tabular file to an xls file

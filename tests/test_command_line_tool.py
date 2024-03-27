@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from nutstools.main import main
+from tabularxls.main import main
 
 __author__ = "EVLT"
 __copyright__ = "EVLT"
@@ -9,13 +9,13 @@ __license__ = "MIT"
 
 def get_root_directory():
     """small utility to get the root directory from which pytests is launched"""
-    current_directory = Path("../src/tabular2xls").cwd().name
+    current_directory = Path("../src/tabularxls").cwd().name
     if current_directory == "tests":
         # we are inside the tests-directory. Move one up
         root_directory = Path("../src")
     else:
         # we are in the root directory
-        root_directory = Path("../src/tabular2xls")
+        root_directory = Path("../src/tabularxls")
     return root_directory
 
 
