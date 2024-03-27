@@ -189,7 +189,7 @@ def test_tabular_2():
     root = get_root_directory()
 
     tabular_file = root / Path("tests/tabular_2.tex")
-    tabular_df = parse_tabular(input_filename=tabular_file)
+    tabular_df = parse_tabular(input_filename=tabular_file, multi_index=True)
 
     expected_column_names = pd.Index(["2008-2013", "2014-2019 ¹⁾"], dtype="object")
 
@@ -200,9 +200,8 @@ def test_tabular_2():
             ("Schuldig verklaard door rechter", ""),
         ],
         dtype="object",
-        names=["", ""],
-        tupleize_cols=True,
     )
+    expected_index = expected_index.rename(["", ""])
 
     expected_columns = {
         "2008-2013": np.array(["512", "93", "124"], dtype=object),
@@ -228,8 +227,8 @@ def test_tabular_3():
     expected_index = pd.Index(
         ["C", "D-E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "Q", "ICT"],
         dtype="object",
-        name="Code",
     )
+    expected_index = expected_index.rename("Code")
 
     expected_columns = {
         "Bedrijfsklasse": np.array(
@@ -256,7 +255,8 @@ def test_tabular_3():
     pt.assert_index_equal(tabular_df.index, expected_index)
     for column_name in expected_column_names:
         expected_col = expected_columns[column_name]
-        nt.assert_array_equal(tabular_df[column_name].to_numpy(), expected_col)
+        tabular_col = tabular_df[column_name].to_numpy()
+        nt.assert_array_equal(tabular_col, expected_col)
 
 
 def test_tabular_4():
@@ -284,8 +284,8 @@ def test_tabular_4():
             "500+",
         ],
         dtype="object",
-        name="Code",
     )
+    expected_index = expected_index.rename("Code")
 
     expected_columns = {
         "Bedrijfsgrootte": np.array(
@@ -352,6 +352,7 @@ def test_tabular_5():
         dtype="object",
         name="Onderwerp",
     )
+    expected_index = expected_index.rename("Onderwerp")
 
     expected_columns = {
         "Pilot 2015": np.array(
