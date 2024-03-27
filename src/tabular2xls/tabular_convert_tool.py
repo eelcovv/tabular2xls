@@ -46,7 +46,7 @@ def parse_args(args):
     parser.add_argument(
         "--search_and_replace",
         help="Search en Replace patterns in case you want to change strings."
-        "By default,  cdots en ast are replaced by . and * vervangen, respectively",
+        "By default, cdots en ast are replaced by . and * vervangen, respectively",
         nargs="*",
         action="append",
     )
