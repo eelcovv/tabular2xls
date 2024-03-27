@@ -19,7 +19,7 @@ Install the tool by::
 
     pip install tabular2xls
 
-In case you want to include CBS color definitions, install with
+In case you want to include CBS color definitions, install with::
 
     pip install tabular2xls[cbs]
 
