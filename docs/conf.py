@@ -34,7 +34,7 @@ except ImportError:
     from sphinx import apidoc
 
 output_dir = os.path.join(__location__, "api")
-module_dir = os.path.join(__location__, "../src/tabular2xls")
+module_dir = os.path.join(__location__, "../src/tabularxls")
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -99,7 +99,7 @@ copyright = "2024, EVLT"
 # If you don’t need the separation provided between version and release,
 # just set them both to the same value.
 try:
-    from tabular2xls import __version__ as version
+    from tabularxls import __version__ as version
 except ImportError:
     version = ""
 
