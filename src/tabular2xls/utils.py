@@ -212,7 +212,7 @@ def clean_the_cells(cells, aliases=None):
 
         if aliases is not None:
             for alias, pattern in aliases.items():
-                if match := re.match(alias, clean_cell):
+                if re.match(alias, clean_cell):
                     clean_cell = clean_cell.replace(alias, pattern)
 
         clean_cells.append(clean_cell.strip())
