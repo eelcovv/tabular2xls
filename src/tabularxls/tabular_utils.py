@@ -312,7 +312,7 @@ def parse_tabular(
     else:
         table_df.set_index(index_columns, drop=True, inplace=True)
         if empty_column_names:
-            table_df.index = table_df.index.rename(["", " "])
+            table_df.index = table_df.index.rename(["", ""])
 
     for alias, pattern in aliases.items():
         for col_name in table_df.columns:
