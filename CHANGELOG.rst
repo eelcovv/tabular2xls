@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.4.5
+=============
+- Bug fix on setting column widths
+
 Version 0.4.4
 =============
 - Add read the docs documentation and published on pypi
