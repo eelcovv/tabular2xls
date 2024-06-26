@@ -569,24 +569,26 @@ def update_width(label, max_width=None):
     return max_width
 
 
-def get_max_width(input_data, name, index=False):
+def get_max_width(input_data, name, column_index=None):
     """
     Determine the maximum string in an index or column of a Dataframe
 
     Args:
         input_data (DataFrame):  The dataframe to check
         name (str): Name of the column to check
-        index (bool, optional): If true, check the maximum width of the index. Defaults to False.
+        column_index (int or None): Index of the column to check
 
     Returns:
         int: The maximum width of this column or index
 
     """
     max_col_width = len(name)
-    if index:
-        values = input_data.index.get_level_values(name)
-    else:
+    if column_index is None:
+        # get the values of the column based on the name of the column
         values = input_data[name]
+    else:
+        # get the values of the column based on the index of the column
+        values = input_data.iloc[:, column_index]
     for value in values:
         col_width = len(str(value))
         if col_width > max_col_width:
@@ -640,35 +642,20 @@ def write_data_to_sheet_multiindex(
 
         wb = WorkBook(workbook=workbook)
 
-        n_index = 0
+        # we now just reset the index such that we loop over column only
+        data_df.reset_index(inplace=True, allow_duplicates=True)
+
         character_width = 1
         start_row = 0
 
-        for col_idx, index_name in enumerate(data_df.index.names):
-            col_width = get_max_width(input_data=data_df, name=index_name, index=True)
-            _logger.info(f"Adjusting {index_name}/{col_idx} with width {col_width}")
+        for col_idx, column_name in enumerate(data_df.columns):
+            col_width = get_max_width(input_data=data_df, name=column_name, column_index=col_idx)
+            _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
             align = wb.left_align
             worksheet.set_column(
                 col_idx, col_idx, col_width * character_width, cell_format=align
             )
-            worksheet.write(start_row, col_idx, index_name, wb.header_format)
-
-            for value in data_df.index.get_level_values(index_name):
-                found_color_name = find_color_name(value)
-                if found_color_name is not None:
-                    _logger.debug(f"Going to set {value} {found_color_name}")
-
-            n_index += 1
-
-        for col_idx, column_name in enumerate(data_df.columns):
-            col_width = get_max_width(input_data=data_df, name=column_name)
-            _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
-            align = wb.left_align
-            col_idx2 = col_idx + n_index
-            worksheet.set_column(
-                col_idx2, col_idx2, col_width * character_width, cell_format=align
-            )
-            worksheet.write(start_row, col_idx2, column_name, wb.header_format)
+            worksheet.write(start_row, col_idx, column_name, wb.header_format)
 
             for idx, value in enumerate(data_df[column_name]):
                 found_color_name = find_color_name(value)
@@ -677,9 +664,9 @@ def write_data_to_sheet_multiindex(
                     cell_format = wb.set_format(found_color_name)
                     new_value = value.replace(found_color_name, "")
                     if cell_format is not None:
-                        worksheet.write(idx + 1, col_idx2, new_value, cell_format)
+                        worksheet.write(idx + 1, col_idx, new_value, cell_format)
                     else:
                         _logger.debug("No color found")
-                        worksheet.write(idx + 1, col_idx2, new_value)
+                        worksheet.write(idx + 1, col_idx, new_value)
 
     _logger.debug("Done")
