@@ -130,8 +130,10 @@ def main(args):
     filename = Path(args.filename)
 
     search_and_replace = {
+        r"\$sharp\$": "#",
         r"\$cdot\$": ".",
         r"\$ast\$": "*",
+        r"\$\^ast\$": "*",
     }
     if args.search_and_replace is not None:
         for k, v in args.search_and_replace.items():

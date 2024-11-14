@@ -229,7 +229,7 @@ def parse_tabular(
     multi_index: bool = False,
     search_and_replace: Union[dict, None] = None,
     encoding: str = "utf-8",
-    top_row_merge: bool = False
+    top_row_merge: bool = False,
 ) -> DataFrame:
     """
     Read the tabular file and convert contents to a data frame
@@ -256,6 +256,9 @@ def parse_tabular(
 
     for line in lines:
         clean_line = line.strip()
+
+        if clean_line.startswith("%") or clean_line == "":
+            continue
         match = re.search("caption{(.*)}", clean_line)
         if match is not None:
             caption = match.group(1)
@@ -293,6 +296,13 @@ def parse_tabular(
         index_columns = ["l1", "l2"]
         empty_column_names = True
     else:
+        if index_columns in header_row[1:]:
+            _logger.warning(
+                f"Your index columns has the same value '{index_columns}' as a column name. "
+                "This might cause problems. Replacing now with index"
+            )
+            index_columns = "index"
+            header_row[0] = index_columns
         table_df = pd.DataFrame.from_records(rows, columns=header_row)
 
     if top_row_merge:
@@ -325,8 +335,29 @@ def parse_tabular(
                 pass
 
     if search_and_replace is not None:
+        # to make sure that also regex in the index are replaced, reset is needed
+        index_names = list(table_df.index.names)
+        column_names = list(table_df.columns)
+        new_column_names = column_names.copy()
+        new_index_names = index_names.copy()
+        table_df.reset_index(inplace=True)
+        # replace all the search strings
         for search, replace in search_and_replace.items():
             table_df.replace(search, replace, regex=True, inplace=True)
+            new_index_names = [
+                re.sub(search, replace, name) for name in new_index_names
+            ]
+            new_names_columns = [
+                re.sub(search, replace, name) for name in new_column_names
+            ]
+
+        # put back
+        table_df.set_index(index_columns, inplace=True, drop=True)
+
+        if not all(x == y for x, y in zip(column_names, new_names_columns)):
+            table_df.columns = new_names_columns
+        if not all(x == y for x, y in zip(index_names, new_index_names)):
+            table_df.index.names = new_index_names
 
     return table_df
 
@@ -649,7 +680,9 @@ def write_data_to_sheet_multiindex(
         start_row = 0
 
         for col_idx, column_name in enumerate(data_df.columns):
-            col_width = get_max_width(input_data=data_df, name=column_name, column_index=col_idx)
+            col_width = get_max_width(
+                input_data=data_df, name=column_name, column_index=col_idx
+            )
             _logger.info(f"Adjusting {column_name}/{col_idx} with width {col_width}")
             align = wb.left_align
             worksheet.set_column(
