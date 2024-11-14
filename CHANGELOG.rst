@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.4.6
+=============
+- Replacement of special characters now also in index and column names
+
 Version 0.4.5
 =============
 - Bug fix on setting column widths
